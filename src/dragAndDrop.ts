@@ -31,7 +31,7 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
             // Merge multiple file URIs into a single uri-list
             const uriList = fileItems
                 .map(item => item.uri.toString())
-                .join('\n');
+                .join('\r\n');
 
             // Set drag data
             dataTransfer.set('text/uri-list', new vscode.DataTransferItem(uriList));
