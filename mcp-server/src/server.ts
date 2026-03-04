@@ -169,6 +169,40 @@ const TOOL_DEFS = {
       color: z.string().optional().describe('Optional VS Code color theme ID (e.g. "charts.blue").'),
     },
   },
+  create_group_by_pattern: {
+    description:
+      'Create a new group and automatically populate it with files matching a glob pattern. ' +
+      'The server scans the workspace itself — the AI does NOT need to pass any file paths. ' +
+      'PREFER this tool over the explore_project → create_group → add_files_to_group sequence when grouping by file type or location.',
+    schema: {
+      groupName: z.string().describe('Name for the new group.'),
+      pattern: z.string().describe(
+        'Glob pattern for files to include, e.g. "**/*.md", "src/**/*.ts". ' +
+        'Follows fast-glob syntax. node_modules / .git / dist / out / build / .vscode are always excluded.'
+      ),
+      ignorePattern: z.string().optional().describe(
+        'Optional additional glob pattern to exclude, e.g. "**/*.test.ts".'
+      ),
+      color: z.string().optional().describe(
+        'Optional VS Code color theme ID (e.g. "charts.blue").'
+      ),
+      parentGroupId: z.string().optional().describe(
+        'Optional ID of the parent group (creates a subgroup if provided).'
+      ),
+    },
+  },
+  remove_files_by_pattern: {
+    description:
+      'Remove files from a specific group whose paths match a glob pattern. ' +
+      'The server resolves matches against the group\'s existing file list — the AI does NOT need to list individual paths. ' +
+      'PREFER this tool over remove_files_from_group when removing many files at once.',
+    schema: {
+      groupId: z.string().describe('The ID of the target group.'),
+      pattern: z.string().describe(
+        'Glob pattern for files to remove, e.g. "**/*.test.ts", "docs/**".'
+      ),
+    },
+  },
 };
 
 // ── Prompt definitions ──────────────────────────────────────────────────────────────
@@ -303,17 +337,38 @@ ${SCHEMA_CONTENT}
 
 ## 4. Common Workflows
 
-### Organize workspace
+### ✅ Group files by type or pattern (PREFERRED)
+Use \`create_group_by_pattern\` — the server scans automatically, no file paths needed:
+\`\`\`
+create_group_by_pattern({ groupName: "Markdown Docs", pattern: "**/*.md" })
+create_group_by_pattern({ groupName: "Source", pattern: "src/**/*.ts", ignorePattern: "**/*.test.ts" })
+\`\`\`
+
+### Remove files by pattern (PREFERRED over listing paths)
+\`\`\`
+remove_files_by_pattern({ groupId: "...", pattern: "**/*.test.ts" })
+\`\`\`
+
+### Organize workspace manually (when pattern-based tools are not suitable)
 1. \`list_groups\` — view existing groups
 2. \`explore_project\` — explore project structure
-3. \`create_group\` — create a new group
-4. \`add_files_to_group\` — add relevant files
-5. \`auto_group_by_extension\` or \`auto_group_by_date\` — auto-group files
+3. \`create_group\` — create an empty group
+4. \`add_files_to_group\` — add files (**IMPORTANT: max 15 paths per call; batch if more**)
 
 ### Clean up invalid references
 1. \`list_groups\` — get all groups
 2. \`read_file\` — verify each file still exists
-3. \`remove_files_from_group\` — remove paths that no longer exist
+3. \`remove_files_from_group\` — remove invalid paths (**max 15 per call**)
+
+## 5. Array Size Limits (CRITICAL)
+
+**When calling tools that accept a \`files\` array (\`add_files_to_group\`, \`remove_files_from_group\`, \`create_group\`, \`append_group_to_json\`), NEVER pass more than 15 file paths in a single call.**
+
+If you have more than 15 files:
+- **Option A (recommended):** Use \`create_group_by_pattern\` or \`remove_files_by_pattern\` instead.
+- **Option B:** Split the array and make multiple calls of ≤ 15 items each.
+
+Passing large arrays in a single call risks JSON truncation and will result in \`undefined\` parameter errors.
 `;
 
 // ── VirtualTabsMCPServer ───────────────────────────────────────────────────────
@@ -387,7 +442,12 @@ export class VirtualTabsMCPServer {
     this.fileTools = new FileTools(this.fileManager);
     this.projectTools = new ProjectTools(this.projectExplorer);
     this.bookmarkTools = new BookmarkTools(this.bookmarkManager);
-    this.autoGroupTools = new AutoGroupTools(this.autoGrouper);
+    this.autoGroupTools = new AutoGroupTools(
+      this.autoGrouper,
+      this.projectExplorer,
+      this.groupManager,
+      this.fileManager,
+    );
 
     this.log('info', `Workspace root updated: ${this.workspaceRoot}`);
   }
@@ -515,6 +575,8 @@ export class VirtualTabsMCPServer {
         case 'set_group_sorting': return this.wrap(() => this.autoGroupTools!.setGroupSorting(this.parseArgs(TOOL_DEFS.set_group_sorting.schema, args)));
         case 'auto_group_by_extension': return this.wrap(() => this.autoGroupTools!.autoGroupByExtension(this.parseArgs(TOOL_DEFS.auto_group_by_extension.schema, args)));
         case 'auto_group_by_date': return this.wrap(() => this.autoGroupTools!.autoGroupByDate(this.parseArgs(TOOL_DEFS.auto_group_by_date.schema, args)));
+        case 'create_group_by_pattern': return this.wrap(() => this.autoGroupTools!.createGroupByPattern(this.parseArgs(TOOL_DEFS.create_group_by_pattern.schema, args)));
+        case 'remove_files_by_pattern': return this.wrap(() => this.autoGroupTools!.removeFilesByPattern(this.parseArgs(TOOL_DEFS.remove_files_by_pattern.schema, args)));
 
         case 'validate_json_structure': {
           const { json_content } = this.parseArgs(TOOL_DEFS.validate_json_structure.schema, args);

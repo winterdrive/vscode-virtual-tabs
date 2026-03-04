@@ -168,6 +168,8 @@ Each skill file includes:
    - **Layer 2** — Use safety tools (`validate_json_structure`, `append_group_to_json`).
    - **Layer 3** — Fall back to the bundled `vt.bundle.js` CLI.
    - **Layer 4** — Report failure to the user; do not edit JSON manually.
+
+   ![Safety Decision Tree](../docs/assets/safety_decision_tree_en.svg)
 4. **Bundled `vt.bundle.js`** — a self-contained CLI written alongside the skill file during generation. Supports `list-groups`, `add-group`, `add-files`, and `remove-group`.
 
 > **Implementation:** `src/mcp/SkillGenerator.ts` — see [DEVELOPMENT.md](../DEVELOPMENT.md#agent-skill-generation) for contributor guidelines.

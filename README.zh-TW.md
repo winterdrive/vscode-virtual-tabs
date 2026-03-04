@@ -94,6 +94,8 @@
 
 - 🔌 **MCP Server 整合** — 完整打包的 MCP 伺服器（`dist/mcp/index.js`）隨擴充功能一起提供，暴露 15+ 工具供 AI 代理建立群組、管理檔案、處理書籤與探索專案。
 - 🛡️ **Agent Skill 生成** — 一個指令即可為您的 AI 工具生成專屬技能檔案（Cursor `.mdc`，其餘工具則為 `SKILL.md`）。包含四層安全決策樹，並清楚標示 VirtualTabs 群組為**純虛擬結構** — 磁碟上不會有任何檔案被移動。
+
+  ![安全決策樹](docs/assets/safety_decision_tree_zh.png)
 - ⚙️ **MCP 設定面板** — 單擊即可取得適用於各 AI 工具的 MCP 伺服器設定 JSON。
 - 📦 **內建 CLI 後備方案** (`vt.bundle.js`) — 與每個生成的技能檔案一同提供的獨立 CLI，在 MCP 工具無法使用時作為最後手段。
 

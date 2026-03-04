@@ -178,15 +178,17 @@ To configure the MCP server for your AI tool:
 - \`set_group_sorting\`: Set the sorting criteria and order for files within a group
 - \`auto_group_by_extension\`: Automatically group files by their file extensions
 - \`auto_group_by_date\`: Automatically group files by their modification date
+- \`create_group_by_pattern\`: **⭐ PREFERRED** — Create a group and auto-populate it with files matching a glob pattern. No file paths needed. Use this instead of \`explore_project\` + \`create_group\` + \`add_files_to_group\` when grouping by type.
+- \`remove_files_by_pattern\`: **⭐ PREFERRED** — Remove all files from a group that match a glob pattern. No file listing needed.
 
 ## Usage Guidelines
 
 Use these tools to help users organize their workspace files into logical groups. The agent should:
 
 1. **Understand user intent** through conversation before creating groups
-2. **Use your own tools** (grepSearch, fileSearch, readCode) to discover relevant files
-3. **Create groups** that reflect the user'\''s mental model of their project
-4. **Add files** based on your analysis of the codebase structure
+2. **Prefer pattern-based tools** — use \`create_group_by_pattern\` / \`remove_files_by_pattern\` whenever the user's intent can be expressed as a glob pattern
+3. **Batch array arguments** — when using \`add_files_to_group\` or \`remove_files_from_group\`, NEVER pass more than **15 file paths per call**. If you have more files, either use the \`*_by_pattern\` tools or split across multiple calls.
+4. **Create groups** that reflect the user'\''s mental model of their project
 
 Example workflow:
 
@@ -272,17 +274,18 @@ The script automatically creates a backup and checks for duplicate names.
 > **User**: 幫我建立一個 md 資料夾，專門裝專案內的所有 markdown
 >
 > ❌ **WRONG response**: "I'\''ll create an md/ folder and move your files there"
+> ❌ **WRONG**: [calls \`explore_project\`] → [calls \`create_group\`] → [calls \`add_files_to_group\` with 30+ paths] — risks JSON truncation
 >
-> ✅ **CORRECT**:
-> **Agent**: [calls \`explore_project\` with glob \`**/*.md\`] → [calls \`create_group\` with name "md"] → [calls \`add_files_to_group\` with found files]
-> "我用 VirtualTabs 幫你建立了虛擬群組 '\''md'\''，並加入了 8 個 markdown 檔案。檔案並未移動位置。"
+> ✅ **CORRECT** (use pattern tool — server handles everything):
+> **Agent**: [calls \`create_group_by_pattern({ groupName: "md", pattern: "**/*.md" })\`]
+> "我用 VirtualTabs 幫你建立了虛擬群組 '\''md'\''，並自動加入了所有 markdown 檔案。檔案並未移動位置。"
 
 ### ✅ Example B: MCP available — TypeScript feature
 
 > **User**: Create a group called "auth" with all TypeScript files in src/auth/
 >
-> **Agent**: [calls \`explore_project\` to find files] → [calls \`create_group\` name "auth"] → [calls \`add_files_to_group\`]
-> "Done! I created the '\''auth'\'' group and added 5 files."
+> **Agent**: [calls \`create_group_by_pattern({ groupName: "auth", pattern: "src/auth/**/*.ts" })\`]
+> "Done! I created the '\''auth'\'' group and added all TypeScript files from src/auth/."
 
 ### 🛑 Example C: MCP not connected (correct HALT behaviour)
 

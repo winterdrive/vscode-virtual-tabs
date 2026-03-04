@@ -94,6 +94,8 @@ In the era of Copilot and LLMs, **precise context** is the key to high-quality r
 
 - 🔌 **MCP Server Integration** — A fully bundled MCP server (`dist/mcp/index.js`) ships with the extension, exposing 15+ tools for AI agents to create groups, manage files, handle bookmarks, and explore the project.
 - 🛡️ **Agent Skill Generation** — One command generates a tailored skill file for your AI tool (Cursor `.mdc`, or `SKILL.md` for Copilot, Claude, Antigravity, Kiro). Includes a four-layer safety decision tree and a CRITICAL CONCEPT warning that VirtualTabs groups are *purely virtual* — no files are ever moved on disk.
+  
+  ![Safety Decision Tree](docs/assets/safety_decision_tree_en.png)
 - ⚙️ **MCP Config Panel** — Get ready-to-paste MCP server configuration for your AI tool with a single click.
 - 📦 **Bundled CLI Fallback** (`vt.bundle.js`) — A self-contained CLI co-located with each generated skill file provides a last-resort editing path when MCP tools are unavailable.
 

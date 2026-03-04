@@ -15,3 +15,5 @@ docs/CRUD_TEST_CASES.md
 docs/E2E_TESTING_GUIDE.md
 use_case/**
 docs/research/**
+.cursor/rules/virtualtabs.mdc
+.cursor/rules/scripts/vt.bundle.js
