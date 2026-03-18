@@ -1,6 +1,6 @@
 {
     "extension.displayName": "VirtualTabs - 虛擬檔案目錄與 AI 上下文管理",
-    "extension.description": "跨越實體檔案結構建立虛擬檔案目錄，內建 MCP 伺服器支援 AI 代理（Cursor、Copilot、Claude、Kiro、Antigravity）直接管理檔案群組。自動生成代理技能檔案、一鍵匯出 AI 上下文。完美對應 MVC/MVVM、Monorepo 與 LLM 上下文管理。支援多選複製、持久化書籤。",
+    "extension.description": "跨越實體檔案結構建立虛擬檔案目錄，內建 MCP 伺服器支援 AI 代理直接管理檔案群組。自動生成代理技能檔案、一鍵匯出 AI 上下文。完美對應大型項目、Monorepo 與 LLM 上下文管理。支援多選複製、持久化書籤。",
     "view.virtualTabsContainer.title": "Virtual Tabs",
     "view.virtualTabsView.name": "Virtual Tabs",
     "command.addGroup.title": "新增群組 (虛擬目錄)",

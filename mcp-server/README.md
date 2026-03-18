@@ -1,6 +1,6 @@
 # VirtualTabs MCP Server
 
-The Model Context Protocol (MCP) server for VirtualTabs, enabling AI agents (Cursor, GitHub Copilot, Kiro, Claude Desktop, Antigravity) to manage file groups programmatically through natural language.
+The Model Context Protocol (MCP) server for VirtualTabs, enabling AI agents (Cursor, GitHub Copilot, Kiro, Claude Code, Antigravity) to manage file groups programmatically through natural language.
 
 ## Architecture: Tool / Resource / Prompt
 
@@ -140,7 +140,7 @@ Supported clients:
 - **Cursor** — AI-powered code editor
 - **GitHub Copilot** — VS Code AI assistant
 - **Kiro** — Professional AI IDE
-- **Claude Desktop** — Anthropic's desktop app
+- **Claude Code** — Anthropic's desktop app
 - **Antigravity** — Google's AI IDE
 
 All clients require their MCP configuration file to point to the MCP Server entry point. Run the command above in VS Code for exact setup instructions.
@@ -155,7 +155,7 @@ Run the VS Code command **VirtualTabs: Generate Agent Skill** to produce the ski
 |:---|:---|:---|
 | Cursor | `.cursor/rules/virtualtabs.mdc` | Auto-loaded as an agent rule |
 | GitHub Copilot | `.github/skills/virtualtabs/SKILL.md` | Agent skill for Copilot |
-| Claude Desktop | `.claude/skills/virtualtabs/SKILL.md` | Skill for Claude Desktop |
+| Claude Code | `.claude/skills/virtualtabs/SKILL.md` | Skill for Claude Code |
 | Kiro IDE | `.kiro/skills/virtualtabs/SKILL.md` | Skill for Kiro |
 | Antigravity | `.agents/skills/virtualtabs/SKILL.md` | Skill for Antigravity |
 

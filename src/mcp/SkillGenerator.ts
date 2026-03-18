@@ -32,9 +32,10 @@ export class SkillGenerator {
         const options = [
             'Cursor (.cursor/rules/virtualtabs.mdc)',
             'Antigravity (.agents/skills/virtualtabs/SKILL.md)',
-            'Claude Desktop (.claude/skills/virtualtabs/SKILL.md)',
+            'Claude Code (.claude/skills/virtualtabs/SKILL.md)',
             'GitHub Copilot (.github/skills/virtualtabs/SKILL.md)',
-            'Kiro IDE (.kiro/skills/virtualtabs/SKILL.md)'
+            'Kiro IDE (.kiro/skills/virtualtabs/SKILL.md)',
+            'Cline (.cline/skills/virtualtabs/SKILL.md)'
         ];
         const choice = await vscode.window.showQuickPick(options, {
             placeHolder: I18n.getMessage('mcp.selectAgentPlaceholder')
@@ -58,8 +59,11 @@ export class SkillGenerator {
         } else if (choice.includes('GitHub Copilot')) {
             const skillPath = await this.generateVSCodeSkill(context, projectRoot, mcpServerScriptPath, '.github');
             return { status: 'generated', target: 'vscode', projectRoot, skillPath };
-        } else {
+        } else if (choice.includes('Kiro')) {
             const skillPath = await this.generateVSCodeSkill(context, projectRoot, mcpServerScriptPath, '.kiro');
+            return { status: 'generated', target: 'vscode', projectRoot, skillPath };
+        } else {
+            const skillPath = await this.generateVSCodeSkill(context, projectRoot, mcpServerScriptPath, '.cline');
             return { status: 'generated', target: 'vscode', projectRoot, skillPath };
         }
     }
@@ -93,12 +97,13 @@ export class SkillGenerator {
         return ruleFilePath;
     }
 
-    private static async generateVSCodeSkill(context: vscode.ExtensionContext, projectRoot: string, mcpServerPath: string, agentType: '.agents' | '.claude' | '.github' | '.kiro' = '.github', openDocument: boolean = true): Promise<string> {
+    private static async generateVSCodeSkill(context: vscode.ExtensionContext, projectRoot: string, mcpServerPath: string, agentType: '.agents' | '.claude' | '.github' | '.kiro' | '.cline' = '.github', openDocument: boolean = true): Promise<string> {
         // Agent Skills directory layout:
         // - Antigravity: .agents/skills/virtualtabs/SKILL.md
-        // - Claude Desktop: .claude/skills/virtualtabs/SKILL.md
+        // - Claude Code: .claude/skills/virtualtabs/SKILL.md
         // - GitHub Copilot: .github/skills/virtualtabs/SKILL.md
         // - Kiro IDE: .kiro/skills/virtualtabs/SKILL.md
+        // - Cline: .cline/skills/virtualtabs/SKILL.md
         const skillsDir = path.join(projectRoot, agentType, 'skills', 'virtualtabs');
         const mdPath = path.join(skillsDir, 'SKILL.md');
 

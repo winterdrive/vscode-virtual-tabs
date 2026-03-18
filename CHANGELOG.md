@@ -6,9 +6,9 @@ All notable changes to the "VirtualTabs" extension will be documented in this fi
 
 ### Added
 
-- **MCP Server Integration**: A fully bundled MCP server (`dist/mcp/index.js`) ships with the extension, enabling AI agents (Cursor, GitHub Copilot, Claude Desktop, Kiro IDE, Antigravity) to manage file groups programmatically via the Model Context Protocol.
+- **MCP Server Integration**: A fully bundled MCP server (`dist/mcp/index.js`) ships with the extension, enabling AI agents (Cursor, GitHub Copilot, Claude Code, Kiro IDE, Antigravity) to manage file groups programmatically via the Model Context Protocol.
 - **Agent Skill Generation** (`VirtualTabs: Generate Agent Skill`): Generates a target-specific skill file (`.mdc` for Cursor, `SKILL.md` for others) containing tool documentation and a four-layer safety decision tree. The skill prominently clarifies that VirtualTabs groups are **purely virtual** — no files are moved on disk — preventing a common class of agent misunderstandings.
-- **MCP Config Panel** (`VirtualTabs: Show MCP Config`): A webview panel displaying ready-to-copy MCP server configuration JSON for each supported AI client (Cursor, GitHub Copilot, Claude Desktop, Kiro IDE, Antigravity).
+- **MCP Config Panel** (`VirtualTabs: Show MCP Config`): A webview panel displaying ready-to-copy MCP server configuration JSON for each supported AI client (Cursor, GitHub Copilot, Claude Code, Kiro IDE, Antigravity).
 - **MCP Tools**: `list_groups`, `create_group`, `rename_group`, `move_group`, `delete_group`, `add_files_to_group`, `remove_files_from_group`, `explore_project`, `read_file`, `create_bookmark`, `delete_bookmark`, `list_bookmarks`, `set_group_sorting`, `auto_group_by_extension`, `auto_group_by_date`.
 - **Safety Fallback MCP Tools**: `validate_json_structure` and `append_group_to_json` for use when primary tools fail; both enforce workspace-relative paths, detect duplicate group names, and auto-create backups before any write.
 - **Bundled CLI Script** (`vt.bundle.js`): A self-contained Node.js CLI bundled alongside each generated skill file as a Layer 3 last-resort fallback. Supports `list-groups`, `add-group`, `add-files`, and `remove-group` commands with automatic workspace-root detection.

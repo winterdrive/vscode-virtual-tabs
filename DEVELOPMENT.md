@@ -629,7 +629,7 @@ npm version major  # Major version (0.0.1 → 1.0.0)
 
 ## 🤖 MCP Server Development
 
-VirtualTabs ships a **bundled MCP (Model Context Protocol) server** that allows AI agents — Cursor, GitHub Copilot, Claude Desktop, Kiro, Antigravity — to manage file groups programmatically. This section explains the architecture, design decisions, and how to extend it.
+VirtualTabs ships a **bundled MCP (Model Context Protocol) server** that allows AI agents — Cursor, GitHub Copilot, Claude Code, Kiro, Antigravity — to manage file groups programmatically. This section explains the architecture, design decisions, and how to extend it.
 
 ### The Three Pillars: Tool vs. Resource vs. Prompt
 
@@ -773,7 +773,7 @@ The command **`VirtualTabs: Generate Agent Skill`** (implemented in `src/mcp/Ski
 |:---|:---|:---|
 | Cursor | `.cursor/rules/virtualtabs.mdc` | `.cursor/mcp.json` |
 | GitHub Copilot | `.github/virtualtabs-skill.md` | `.vscode/mcp.json` |
-| Claude Desktop | `.claude/virtualtabs-skill.md` | `claude_desktop_config.json` |
+| Claude Code | `.claude/virtualtabs-skill.md` | `~/.claude.json` |
 | Kiro IDE | `.kiro/virtualtabs-skill.md` | `.kiro/mcp.json` |
 | Antigravity | `.agents/virtualtabs-skill.md` | `.vscode/mcp.json` |
 

@@ -1,6 +1,6 @@
 {
     "extension.displayName": "VirtualTabs - 自定义文件分组与 AI 上下文管理",
-    "extension.description": "跨目录创建虚拟分页组，突破文件夹限制。内置 MCP 服务器支持 AI 代理（Cursor、Copilot、Claude、Kiro、Antigravity）直接管理文件分组。自动生成代理技能文件、一键导出 AI 上下文。完美适配 MVC/MVVM、Monorepo 与 LLM 上下文管理。支持多选复制、持久化书签。",
+    "extension.description": "跨目录创建虚拟分页组，突破文件夹限制。内置 MCP 服务器支持 AI 代理直接管理文件分组。自动生成代理技能文件、一键导出 AI 上下文。完美适配大型项目、Monorepo 与 LLM 上下文管理。支持多选复制、持久化书签。",
     "view.virtualTabsContainer.title": "Virtual Tabs",
     "view.virtualTabsView.name": "Virtual Tabs",
     "command.addGroup.title": "新增群组",
