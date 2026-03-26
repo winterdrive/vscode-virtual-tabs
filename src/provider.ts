@@ -43,6 +43,9 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
     // Last successfully loaded version number (for optimistic locking)
     private loadedVersion: number = 0;
 
+    // Registry of rendered TempFileItems by ID, so reveal() can use exact same instance
+    private fileItemRegistry: Map<string, TempFileItem> = new Map();
+
     constructor(_context?: vscode.ExtensionContext) {
         const root = this.getWorkspaceRootPath();
         if (root) {
@@ -329,8 +332,55 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
         });
     }
 
+    /**
+     * Synchronize the built-in group ("Currently Open Files") with actual VS Code tabs.
+     * Fires tree update ONLY if the exact set of open files changed (ignores ordering 
+     * changes from tabpane focus shifts) to prevent stealing focus or breaking reveal.
+     */
+    syncBuiltInGroup(): boolean {
+        let changed = false;
+        const builtIn = this.groups.find(g => g.builtIn);
+        
+        if (builtIn) {
+            const openUris = vscode.window.tabGroups.all
+                .flatMap(g => g.tabs)
+                .map(tab => getTabUri(tab))
+                .filter((uri): uri is vscode.Uri => !!uri)
+                .map(uri => uri.toString());
+            
+            const oldFiles = builtIn.files || [];
+            const oldSet = new Set(oldFiles);
+            const newSet = new Set(openUris);
+            
+            let setsEqual = oldSet.size === newSet.size;
+            if (setsEqual) {
+                for (const uri of newSet) {
+                    if (!oldSet.has(uri)) {
+                        setsEqual = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!setsEqual) {
+                // Keep order stable: retain old files in their current order, append new ones
+                const newFilesStable = oldFiles.filter(uri => newSet.has(uri));
+                for (const uri of openUris) {
+                    if (!oldSet.has(uri)) {
+                        newFilesStable.push(uri);
+                    }
+                }
+                builtIn.files = newFilesStable;
+                this.saveGroups();
+                this._onDidChangeTreeData.fire(undefined);
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
     refresh(save: boolean = true): void {
-        // Resync built-in group content
+        // Resync built-in group content but force the update
         const builtIn = this.groups.find(g => g.builtIn);
         if (builtIn) {
             const openUris = vscode.window.tabGroups.all
@@ -805,6 +855,95 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
         this.refresh();
     }
 
+    /**
+     * Required by TreeView.reveal() to open collapsed folders
+     */
+    getParent(element: vscode.TreeItem): vscode.ProviderResult<vscode.TreeItem> {
+        if (element instanceof BookmarkItem) {
+            // Return corresponding TempFileItem
+            const group = this.groups[element.groupIdx];
+            return new TempFileItem(element.fileUri, element.groupIdx, group?.builtIn, group?.id);
+        }
+        if (element instanceof TempFileItem) {
+            // Return corresponding TempFolderItem
+            const group = this.groups[element.groupIdx];
+            if (group) {
+                return new TempFolderItem(group.name, element.groupIdx, group.id, group.builtIn);
+            }
+        }
+        if (element instanceof TempFolderItem) {
+            // Return parent TempFolderItem if it's a sub-group
+            const group = this.groups[element.groupIdx];
+            if (group && group.parentGroupId) {
+                const parentIdx = this.groups.findIndex(g => g.id === group.parentGroupId);
+                const parentGroup = this.groups[parentIdx];
+                if (parentGroup) {
+                    return new TempFolderItem(parentGroup.name, parentIdx, parentGroup.id, parentGroup.builtIn, true);
+                }
+            }
+        }
+        return undefined;
+    }
+
+    /**
+     * Return the TempFolderItem for the built-in group to use in a pre-reveal expand call.
+     */
+    getBuiltInFolderItem(): TempFolderItem | undefined {
+        const builtInIdx = this.groups.findIndex(g => g.builtIn);
+        if (builtInIdx === -1) return undefined;
+        const group = this.groups[builtInIdx];
+        return new TempFolderItem(group.name, builtInIdx, group.id, true);
+    }
+
+    /**
+     * Helper for platform-specific path comparison.
+     */
+    private pathsEqual(p1: string, p2: string): boolean {
+        if (p1 === p2) return true;
+        // On Windows, paths are case-insensitive.
+        if (process.platform === 'win32') {
+            return p1.toLowerCase() === p2.toLowerCase();
+        }
+        return false;
+    }
+
+    /**
+     * Find a TempFileItem in the built-in group (Currently Open Files).
+     * Returns the EXACT same instance that was rendered by getChildren() via the registry,
+     * so that TreeView.reveal() can find the node.
+     */
+    findInternalFileItem(uri: vscode.Uri): TempFileItem | undefined {
+        const builtInIdx = this.groups.findIndex(g => g.builtIn);
+        if (builtInIdx === -1) return undefined;
+        
+        const group = this.groups[builtInIdx];
+        if (!group || !group.files) return undefined;
+
+        // Fallback matching to handle URI casing/encoding differences on Windows
+        const targetFsPath = uri.fsPath;
+        const matchedStr = group.files.find(f => {
+            if (f === uri.toString()) return true;
+            try {
+                return this.pathsEqual(vscode.Uri.parse(f).fsPath, targetFsPath);
+            } catch {
+                return false;
+            }
+        });
+
+        if (!matchedStr) return undefined;
+
+        // Construct the stable ID exactly as TempFileItem constructor does
+        const matchedUri = vscode.Uri.parse(matchedStr);
+        const expectedId = `virtualTabsFile:${group.id}:${matchedUri.toString()}`;
+        
+        // First try: return cached exact instance from the registry
+        const cached = this.fileItemRegistry.get(expectedId);
+        if (cached) return cached;
+
+        // Fallback: construct a new one (tree might not have expanded yet)
+        return new TempFileItem(matchedUri, builtInIdx, true, group.id);
+    }
+
     getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
         return element;
     }
@@ -859,9 +998,19 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
                     group.sortOrder || 'asc'
                 );
 
+                // Clear stale registrations for this group before re-populating
+                if (group.builtIn) {
+                    this.fileItemRegistry.clear();
+                }
+
                 const fileItems = sortedFiles.map(uriStr => {
                     const uri = vscode.Uri.parse(uriStr);
-                    const fileItem = new TempFileItem(uri, element.groupIdx, group.builtIn);
+                    const fileItem = new TempFileItem(uri, element.groupIdx, group.builtIn, group.id);
+
+                    // Cache the rendered item so reveal() can use the same instance
+                    if (group.builtIn && fileItem.id) {
+                        this.fileItemRegistry.set(fileItem.id, fileItem);
+                    }
 
                     // Check if file has bookmarks (v0.2.0)
                     const bookmarks = BookmarkManager.getBookmarksForFile(group, uriStr);

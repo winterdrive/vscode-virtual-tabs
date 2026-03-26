@@ -2,7 +2,7 @@
     "name": "virtual-tabs",
     "displayName": "%extension.displayName%",
     "description": "%extension.description%",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "publisher": "winterdrive",
     "icon": "docs/assets/virtualtabs_icon_128.png",
     "categories": [
@@ -45,6 +45,11 @@
         "configuration": {
             "title": "Virtual Tabs",
             "properties": {
+                "virtualTabs.autoRevealActiveFile": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically reveal and highlight the active editor file in the Virtual Tabs view"
+                },
                 "virtualTabs.confirmBeforeDelete": {
                     "type": "boolean",
                     "default": true,

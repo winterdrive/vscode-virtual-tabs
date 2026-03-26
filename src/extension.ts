@@ -72,10 +72,40 @@ export async function activate(context: vscode.ExtensionContext) {
     });
 
 
+    // Listen for active editor change to auto-reveal file in the Virtual Tabs panel.
+    // NOTE: We intentionally do NOT call syncBuiltInGroup() here to avoid triggering
+    // a tree data change event (which clears the registry) mid-reveal, causing a race condition.
+    // Tab open/close events are handled by onDidChangeVisibleTextEditors below.
+    context.subscriptions.push(
+        vscode.window.onDidChangeActiveTextEditor(editor => {
+            if (!editor || !editor.document) return;
+
+            const config = vscode.workspace.getConfiguration('virtualTabs');
+            if (!config.get<boolean>('autoRevealActiveFile', true)) return;
+            if (!treeView.visible) return;
+
+            const activeUri = editor.document.uri;
+
+            // Single-step reveal with expand:true.
+            // VS Code will call getParent() to traverse the ancestor chain and expand
+            // collapsed nodes automatically, then select the item.
+            const itemToReveal = provider.findInternalFileItem(activeUri);
+
+            if (itemToReveal) {
+                try {
+                    treeView.reveal(itemToReveal, { select: true, focus: false, expand: true });
+                } catch (e) {
+                    console.error('Tree reveal failed:', e);
+                }
+            }
+        })
+    );
+
     // Listen for editor file open/close events to auto-refresh the tree view
+    // Only use syncBuiltInGroup here to avoid recreating the entire tree when switching tabs
     context.subscriptions.push(
         vscode.window.onDidChangeVisibleTextEditors(() => {
-            provider.refresh();
+            provider.syncBuiltInGroup();
         })
     );
 
