@@ -42,5 +42,6 @@
     "command.copyGroupContext.title": "Copy Context for AI",
     "command.copyGroupPaths.title": "Copy File Paths",
     "command.copyName.title": "Copy Name",
-    "config.confirmBeforeDelete.description": "Show confirmation dialog before deleting groups or files"
+    "config.confirmBeforeDelete.description": "Show confirmation dialog before deleting groups or files",
+    "config.autoRevealActiveFile.description": "Automatically reveal and highlight the active editor file in the Virtual Tabs view"
 }
