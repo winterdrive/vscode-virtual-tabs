@@ -1,5 +1,6 @@
 {
     "group.builtInName": "Currently Open Files",
+    "group.editorGroupName": "Group {0}",
     "group.newGroupName": "New Group",
     "group.autoGroupPrefix": "[Auto]",
     "group.copyPostfix": "Copy",

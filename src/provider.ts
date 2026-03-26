@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { TempGroup, SortCriteria, DateGroup, VTBookmark } from './types';
-import { TempFileItem, TempFolderItem, BookmarkItem } from './treeItems';
+import { TempFileItem, TempFolderItem, BookmarkItem, EditorGroupItem } from './treeItems';
 import { I18n } from './i18n';
 import { FileSorter } from './core/FileSorter';
 import { AutoGrouper } from './core/AutoGrouper';
@@ -20,6 +20,16 @@ function getTabUri(tab: vscode.Tab): vscode.Uri | undefined {
     if (input instanceof vscode.TabInputCustom) { return input.uri; }
     if (input instanceof vscode.TabInputTextDiff) { return input.modified; }
     return undefined;
+}
+
+/**
+ * In-memory snapshot of a single VS Code editor group's open files.
+ * Not persisted to disk; rebuilt on every sync from vscode.window.tabGroups.
+ */
+interface EditorGroupInfo {
+    viewColumn: number;
+    label: string;
+    files: string[];
 }
 
 // TreeDataProvider implementation
@@ -45,6 +55,9 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
 
     // Registry of rendered TempFileItems by ID, so reveal() can use exact same instance
     private fileItemRegistry: Map<string, TempFileItem> = new Map();
+
+    // Per-group file lists mirroring vscode.window.tabGroups.all (in-memory only, not persisted)
+    private builtInEditorGroups: EditorGroupInfo[] = [];
 
     constructor(_context?: vscode.ExtensionContext) {
         const root = this.getWorkspaceRootPath();
@@ -318,6 +331,7 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
     }
 
     private initBuiltInGroup() {
+        this.builtInEditorGroups = this.computeEditorGroups();
         // Get all open editor files
         const openUris = vscode.window.tabGroups.all
             .flatMap(g => g.tabs)
@@ -333,20 +347,57 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
     }
 
     /**
+     * Build a snapshot of VS Code editor groups containing at least one text/notebook file.
+     * Groups with only non-text tabs (e.g. Settings, Welcome) are excluded.
+     */
+    private computeEditorGroups(): EditorGroupInfo[] {
+        return vscode.window.tabGroups.all
+            .map((tabGroup, idx) => ({
+                viewColumn: tabGroup.viewColumn,
+                label: I18n.getMessage('group.editorGroupName', String(idx + 1)),
+                files: tabGroup.tabs
+                    .map(tab => getTabUri(tab))
+                    .filter((uri): uri is vscode.Uri => !!uri)
+                    .map(uri => uri.toString())
+            }))
+            .filter(group => group.files.length > 0);
+    }
+
+    /**
+     * Returns true if the new editor group snapshot differs from the current one
+     * in either count, column assignment, or file distribution.
+     * Matches groups by viewColumn (not array index) to handle reordering correctly.
+     */
+    private hasEditorGroupStructureChanged(newGroups: EditorGroupInfo[]): boolean {
+        if (newGroups.length !== this.builtInEditorGroups.length) return true;
+
+        const oldByViewColumn = new Map(this.builtInEditorGroups.map(g => [g.viewColumn, g]));
+
+        for (const ng of newGroups) {
+            const og = oldByViewColumn.get(ng.viewColumn);
+            if (!og) return true; // New view column appeared
+            const ngFiles = new Set(ng.files);
+            const ogFiles = new Set(og.files);
+            if (ngFiles.size !== ogFiles.size) return true;
+            for (const f of ngFiles) {
+                if (!ogFiles.has(f)) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Synchronize the built-in group ("Currently Open Files") with actual VS Code tabs.
-     * Fires tree update ONLY if the exact set of open files changed (ignores ordering 
-     * changes from tabpane focus shifts) to prevent stealing focus or breaking reveal.
+     * Fires tree update if the set of open files OR the editor-group distribution changed.
+     * Ignores pure ordering changes from tabpane focus shifts to prevent stealing focus.
      */
     syncBuiltInGroup(): boolean {
         let changed = false;
         const builtIn = this.groups.find(g => g.builtIn);
         
         if (builtIn) {
-            const openUris = vscode.window.tabGroups.all
-                .flatMap(g => g.tabs)
-                .map(tab => getTabUri(tab))
-                .filter((uri): uri is vscode.Uri => !!uri)
-                .map(uri => uri.toString());
+            const newEditorGroups = this.computeEditorGroups();
+            const openUris = newEditorGroups.flatMap(g => g.files);
             
             const oldFiles = builtIn.files || [];
             const oldSet = new Set(oldFiles);
@@ -362,15 +413,22 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
                 }
             }
 
-            if (!setsEqual) {
-                // Keep order stable: retain old files in their current order, append new ones
-                const newFilesStable = oldFiles.filter(uri => newSet.has(uri));
-                for (const uri of openUris) {
-                    if (!oldSet.has(uri)) {
-                        newFilesStable.push(uri);
+            const groupStructureChanged = this.hasEditorGroupStructureChanged(newEditorGroups);
+
+            if (!setsEqual || groupStructureChanged) {
+                this.builtInEditorGroups = newEditorGroups;
+
+                if (!setsEqual) {
+                    // Keep order stable: retain old files in their current order, append new ones
+                    const newFilesStable = oldFiles.filter(uri => newSet.has(uri));
+                    for (const uri of openUris) {
+                        if (!oldSet.has(uri)) {
+                            newFilesStable.push(uri);
+                        }
                     }
+                    builtIn.files = newFilesStable;
                 }
-                builtIn.files = newFilesStable;
+
                 this.saveGroups();
                 this._onDidChangeTreeData.fire(undefined);
                 changed = true;
@@ -383,6 +441,7 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
         // Resync built-in group content but force the update
         const builtIn = this.groups.find(g => g.builtIn);
         if (builtIn) {
+            this.builtInEditorGroups = this.computeEditorGroups();
             const openUris = vscode.window.tabGroups.all
                 .flatMap(g => g.tabs)
                 .map(tab => getTabUri(tab))
@@ -864,9 +923,24 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
             const group = this.groups[element.groupIdx];
             return new TempFileItem(element.fileUri, element.groupIdx, group?.builtIn, group?.id);
         }
+        if (element instanceof EditorGroupItem) {
+            // Return the built-in TempFolderItem
+            const builtInIdx = this.groups.findIndex(g => g.builtIn);
+            if (builtInIdx === -1) return undefined;
+            const builtIn = this.groups[builtInIdx];
+            return new TempFolderItem(builtIn.name, builtInIdx, builtIn.id, true);
+        }
         if (element instanceof TempFileItem) {
             // Return corresponding TempFolderItem
             const group = this.groups[element.groupIdx];
+            if (group?.builtIn && this.builtInEditorGroups.length > 1) {
+                // File lives under an editor-group sub-node; find its group
+                const uriStr = element.uri.toString();
+                const editorGroup = this.builtInEditorGroups.find(eg => eg.files.includes(uriStr));
+                if (editorGroup) {
+                    return new EditorGroupItem(editorGroup.label, editorGroup.viewColumn, element.groupIdx, group.id);
+                }
+            }
             if (group) {
                 return new TempFolderItem(group.name, element.groupIdx, group.id, group.builtIn);
             }
@@ -972,6 +1046,14 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
 
             if (!group) return [];
 
+            // Built-in group with multiple editor groups: render editor-group sub-nodes
+            if (group.builtIn && this.builtInEditorGroups.length > 1) {
+                this.fileItemRegistry.clear();
+                return this.builtInEditorGroups.map(eg =>
+                    new EditorGroupItem(eg.label, eg.viewColumn, element.groupIdx, group.id)
+                );
+            }
+
             const items: vscode.TreeItem[] = [];
 
             // 1. Sub-groups
@@ -1026,6 +1108,28 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
             }
 
             return items;
+        }
+
+        // Editor-group sub-node: show the files belonging to that VS Code editor group
+        if (element instanceof EditorGroupItem) {
+            const builtInIdx = this.groups.findIndex(g => g.builtIn);
+            if (builtInIdx === -1) return [];
+            const builtIn = this.groups[builtInIdx];
+
+            const editorGroup = this.builtInEditorGroups.find(eg => eg.viewColumn === element.viewColumn);
+            if (!editorGroup) return [];
+
+            return editorGroup.files.map(uriStr => {
+                const uri = vscode.Uri.parse(uriStr);
+                const fileItem = new TempFileItem(uri, builtInIdx, true, builtIn.id);
+
+                // Register for reveal() lookup
+                if (fileItem.id) {
+                    this.fileItemRegistry.set(fileItem.id, fileItem);
+                }
+
+                return fileItem;
+            });
         }
 
         // If it's a file node, show bookmarks (v0.2.0)

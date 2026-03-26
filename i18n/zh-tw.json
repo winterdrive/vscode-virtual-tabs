@@ -1,5 +1,6 @@
 {
     "group.builtInName": "目前已開啟檔案",
+    "group.editorGroupName": "群組 {0}",
     "group.newGroupName": "新群組",
     "group.autoGroupPrefix": "[自動]",
     "group.copyPostfix": "複本",

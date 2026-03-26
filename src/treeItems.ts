@@ -58,6 +58,26 @@ export class TempFileItem extends vscode.TreeItem {
 }
 
 /**
+ * Editor Group TreeItem
+ * Represents a VS Code editor group (split panel) under the built-in "Currently Open Files" group.
+ * Shown only when two or more editor groups are open.
+ */
+export class EditorGroupItem extends vscode.TreeItem {
+    constructor(
+        label: string,
+        public readonly viewColumn: number,
+        public readonly builtInGroupIdx: number,
+        public readonly builtInGroupId: string,
+    ) {
+        super(label, vscode.TreeItemCollapsibleState.Expanded);
+        this.id = `virtualTabsEditorGroup:${viewColumn}`;
+        this.iconPath = new vscode.ThemeIcon('layout-panel-left');
+        this.contextValue = 'virtualTabsEditorGroup';
+        this.command = undefined;
+    }
+}
+
+/**
  * Bookmark TreeItem (v0.2.0)
  * Represents a code bookmark within a file
  */
