@@ -37,16 +37,18 @@ export class McpConfigPanel {
     private _disposables: vscode.Disposable[] = [];
 
     private readonly _extensionUri: vscode.Uri;
+    private readonly _stableMcpServerPath: string | undefined;
 
-    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, stableMcpServerPath?: string) {
         this._panel = panel;
         this._extensionUri = extensionUri;
+        this._stableMcpServerPath = stableMcpServerPath;
 
         this._update();
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
     }
 
-    public static show(extensionUri: vscode.Uri) {
+    public static show(extensionUri: vscode.Uri, stableMcpServerPath?: string) {
         if (McpConfigPanel.currentPanel) {
             McpConfigPanel.currentPanel._panel.reveal(vscode.ViewColumn.One);
             return;
@@ -62,7 +64,7 @@ export class McpConfigPanel {
             }
         );
 
-        McpConfigPanel.currentPanel = new McpConfigPanel(panel, extensionUri);
+        McpConfigPanel.currentPanel = new McpConfigPanel(panel, extensionUri, stableMcpServerPath);
     }
 
     public dispose() {
@@ -77,8 +79,11 @@ export class McpConfigPanel {
     }
 
     private _update() {
-        // Get the MCP Server entry-point path
-        const serverPath = path.join(this._extensionUri.fsPath, 'dist', 'mcp', 'index.js').replace(/\\/g, '/');
+        // Get the MCP Server entry-point path.
+        // Priority 1: stable path under globalStorageUri (version-independent, recommended for users).
+        // Priority 2: fallback to extensionUri path (includes version number, changes on update).
+        const serverPath = this._stableMcpServerPath
+            ?? path.join(this._extensionUri.fsPath, 'dist', 'mcp', 'index.js').replace(/\\/g, '/');
 
         const workspaceContext = this._resolveWorkspaceContext();
         const toolConfigs = this._buildToolConfigs();

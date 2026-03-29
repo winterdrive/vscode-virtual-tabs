@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 import { TempFoldersProvider } from './provider';
 import { TempFoldersDragAndDropController } from './dragAndDrop';
 import { registerCommands } from './commands';
@@ -6,10 +8,43 @@ import { I18n } from './i18n';
 import { TempFolderItem, TempFileItem } from './treeItems';
 
 /**
+ * 將 MCP server 部署到不受版本號影響的穩定路徑（globalStorageUri）。
+ * 每次擴充功能啟動時自動執行，確保用戶配置的 MCP 路徑永遠指向最新版本。
+ * @returns 穩定路徑的字串（使用 `/` 分隔符），若部署失敗則返回 undefined
+ */
+async function deployMcpServer(context: vscode.ExtensionContext): Promise<string | undefined> {
+    const sourceFile = vscode.Uri.joinPath(context.extensionUri, 'dist', 'mcp', 'index.js');
+    const targetDir = vscode.Uri.joinPath(context.globalStorageUri, 'mcp');
+    const targetFile = vscode.Uri.joinPath(targetDir, 'index.js');
+
+    try {
+        // 確保目標目錄存在
+        await vscode.workspace.fs.createDirectory(targetDir);
+        
+
+        // 讀取原始 MCP server 檔案內容
+        const sourceContent = await vscode.workspace.fs.readFile(sourceFile);
+
+        // 寫入穩定路徑（覆蓋舊版本）
+        await vscode.workspace.fs.writeFile(targetFile, sourceContent);
+
+        console.log(`[VirtualTabs] MCP server deployed to stable path: ${targetFile.fsPath}`);
+        return targetFile.fsPath.replace(/\\/g, '/');
+    } catch (error) {
+        // 部署失敗不影響擴充功能主要功能，降低為警告
+        console.warn('[VirtualTabs] Failed to deploy MCP server to stable path:', error);
+        return undefined;
+    }
+}
+
+/**
  * Activate the extension
  * @param context Extension context
  */
 export async function activate(context: vscode.ExtensionContext) {
+    // 部署 MCP server 到穩定路徑（與版本號無關）
+    const stableMcpPath = await deployMcpServer(context);
+
     // Initialize i18n
     await I18n.initialize(context);
 
@@ -142,7 +177,7 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     // Register all commands
-    registerCommands(context, provider);
+    registerCommands(context, provider, stableMcpPath);
 
     // Watch for .vscode/virtualTab.json changes
     const configPath = vscode.workspace.workspaceFolders?.[0]

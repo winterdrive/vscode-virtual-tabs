@@ -253,7 +253,7 @@ function resolveGroupItem(
 }
 
 // VirtualTabs command registration
-export function registerCommands(context: vscode.ExtensionContext, provider: TempFoldersProvider): void {
+export function registerCommands(context: vscode.ExtensionContext, provider: TempFoldersProvider, stableMcpPath?: string): void {
     // Run executable file in terminal (explicit action via inline button)
     context.subscriptions.push(vscode.commands.registerCommand('virtualTabs.runFile', async (target?: FileCommandTarget) => {
         const uri = getFileUri(target);
@@ -281,7 +281,7 @@ export function registerCommands(context: vscode.ExtensionContext, provider: Tem
 
     // Register show MCP Config
     context.subscriptions.push(vscode.commands.registerCommand('virtualTabs.showMcpConfig', () => {
-        McpConfigPanel.show(context.extensionUri);
+        McpConfigPanel.show(context.extensionUri, stableMcpPath);
     }));
 
     // Register add sub-group command
