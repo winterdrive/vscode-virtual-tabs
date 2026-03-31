@@ -11,6 +11,8 @@
     "command.addSubGroup.title": "Add Sub-Group",
     "command.moveGroupUp.title": "Move Up",
     "command.moveGroupDown.title": "Move Down",
+    "command.moveFileUp.title": "Move Up",
+    "command.moveFileDown.title": "Move Down",
     "command.refreshBuiltInGroup.title": "Refresh",
     "command.autoGroupByExt.title": "Auto Group by Extension",
     "command.addSelectedFilesToGroup.title": "Add Selected Files to Group",

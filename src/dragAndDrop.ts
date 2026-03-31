@@ -66,6 +66,24 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
 
         if (fileData) {
             const draggedFiles = fileData.value as TempFileItem[];
+
+            // Reorder within the same group when dropping onto another file in that group
+            if (target instanceof TempFileItem) {
+                const allSameGroup = draggedFiles.every(f => f.groupIdx === target.groupIdx);
+                if (allSameGroup && draggedFiles.length > 0) {
+                    for (const draggedFile of draggedFiles) {
+                        if (draggedFile.uri.toString() !== target.uri.toString()) {
+                            this.provider.reorderFileInGroup(
+                                draggedFile.groupIdx,
+                                draggedFile.uri.toString(),
+                                target.uri.toString()
+                            );
+                        }
+                    }
+                    return;
+                }
+            }
+
             // Try determine target group
             const targetGroup = this.determineTargetGroup(target);
             if (targetGroup) {

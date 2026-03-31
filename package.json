@@ -113,6 +113,14 @@
                 "title": "%command.moveGroupDown.title%"
             },
             {
+                "command": "virtualTabs.moveFileUp",
+                "title": "%command.moveFileUp.title%"
+            },
+            {
+                "command": "virtualTabs.moveFileDown",
+                "title": "%command.moveFileDown.title%"
+            },
+            {
                 "command": "virtualTabs.refreshBuiltInGroup",
                 "title": "%command.refreshBuiltInGroup.title%",
                 "icon": "$(refresh)"
@@ -420,6 +428,16 @@
                     "group": "inline@2"
                 },
                 {
+                    "command": "virtualTabs.moveFileUp",
+                    "when": "view == virtualTabsView && (viewItem == virtualTabsFileCustom || viewItem == virtualTabsFileCustomExec)",
+                    "group": "3_organize@0"
+                },
+                {
+                    "command": "virtualTabs.moveFileDown",
+                    "when": "view == virtualTabsView && (viewItem == virtualTabsFileCustom || viewItem == virtualTabsFileCustomExec)",
+                    "group": "3_organize@0.1"
+                },
+                {
                     "command": "virtualTabs.removeSelectedFilesFromGroup",
                     "when": "view == virtualTabsView && virtualTabs:hasCustomFileSelected && (viewItem == virtualTabsFileCustom || viewItem == virtualTabsFileCustomExec)",
                     "group": "3_modify@1"
@@ -542,6 +560,16 @@
                 "command": "virtualTabs.renameGroup",
                 "key": "f2",
                 "when": "focusedView == virtualTabsView && listFocus"
+            },
+            {
+                "command": "virtualTabs.moveFileUp",
+                "key": "alt+up",
+                "when": "focusedView == virtualTabsView && listFocus && viewItem =~ /virtualTabsFileCustom/"
+            },
+            {
+                "command": "virtualTabs.moveFileDown",
+                "key": "alt+down",
+                "when": "focusedView == virtualTabsView && listFocus && viewItem =~ /virtualTabsFileCustom/"
             }
         ]
     },

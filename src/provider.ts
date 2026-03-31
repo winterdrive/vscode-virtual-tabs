@@ -527,6 +527,44 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
         this.refresh();
     }
 
+    moveFile(groupIdx: number, fileUri: string, direction: 'up' | 'down') {
+        const group = this.groups[groupIdx];
+        if (!group || !group.files) return;
+
+        const currentIndex = group.files.indexOf(fileUri);
+        if (currentIndex < 0) return;
+
+        const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+        if (targetIndex < 0 || targetIndex >= group.files.length) return;
+
+        // Clear any active sort so manual order is preserved on display
+        if (group.sortBy && group.sortBy !== 'none') {
+            group.sortBy = 'none';
+        }
+
+        [group.files[currentIndex], group.files[targetIndex]] = [group.files[targetIndex], group.files[currentIndex]];
+        this.refresh();
+    }
+
+    reorderFileInGroup(groupIdx: number, fileUri: string, targetUri: string) {
+        const group = this.groups[groupIdx];
+        if (!group || !group.files) return;
+
+        const fromIndex = group.files.indexOf(fileUri);
+        const toIndex = group.files.indexOf(targetUri);
+        if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
+
+        // Clear any active sort so manual order is preserved on display
+        if (group.sortBy && group.sortBy !== 'none') {
+            group.sortBy = 'none';
+        }
+
+        group.files.splice(fromIndex, 1);
+        const newToIndex = group.files.indexOf(targetUri);
+        group.files.splice(newToIndex, 0, fileUri);
+        this.refresh();
+    }
+
     /**
      * Remove group by ID (recursive)
      * Recommended over index-based removal for nested structures

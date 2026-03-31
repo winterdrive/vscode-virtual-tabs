@@ -303,6 +303,18 @@ export function registerCommands(context: vscode.ExtensionContext, provider: Tem
         }
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand('virtualTabs.moveFileUp', (item: TempFileItem) => {
+        if (item instanceof TempFileItem) {
+            provider.moveFile(item.groupIdx, item.uri.toString(), 'up');
+        }
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('virtualTabs.moveFileDown', (item: TempFileItem) => {
+        if (item instanceof TempFileItem) {
+            provider.moveFile(item.groupIdx, item.uri.toString(), 'down');
+        }
+    }));
+
     // Register remove group command (supports multi-select)
     context.subscriptions.push(vscode.commands.registerCommand('virtualTabs.removeGroup', async (item: TempFolderItem, selectedItems?: TempFolderItem[]) => {
         // Check if multiple groups are selected

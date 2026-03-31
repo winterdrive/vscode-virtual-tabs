@@ -11,6 +11,8 @@
     "command.addSubGroup.title": "新增子群組",
     "command.moveGroupUp.title": "位置往上",
     "command.moveGroupDown.title": "位置往下",
+    "command.moveFileUp.title": "位置往上",
+    "command.moveFileDown.title": "位置往下",
     "command.refreshBuiltInGroup.title": "重新整理群組",
     "command.autoGroupByExt.title": "自動依副檔名分群",
     "command.addSelectedFilesToGroup.title": "加入選取的檔案到群組",

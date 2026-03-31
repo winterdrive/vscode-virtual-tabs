@@ -11,6 +11,8 @@
     "command.addSubGroup.title": "新增子群组",
     "command.moveGroupUp.title": "向上移动",
     "command.moveGroupDown.title": "向下移动",
+    "command.moveFileUp.title": "向上移动",
+    "command.moveFileDown.title": "向下移动",
     "command.refreshBuiltInGroup.title": "刷新群组",
     "command.autoGroupByExt.title": "按扩展名自动分组",
     "command.addSelectedFilesToGroup.title": "将选中的文件添加到群组",
