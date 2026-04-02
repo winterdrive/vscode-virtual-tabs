@@ -108,3 +108,37 @@ export interface BookmarkInfo {
     description?: string;
     created: number;
 }
+
+/**
+ * Transmit Target (v0.5.0)
+ * Defines a destination path for file transmission
+ */
+export interface TransmitTarget {
+    /**
+     * Display name for the target
+     * Example: "Production Server", "Backup Folder"
+     */
+    name: string;
+
+    /**
+     * Destination path (absolute path or network path)
+     * Example: "D:\\Deploy", "\\\\server\\share"
+     */
+    path: string;
+}
+
+/**
+ * VirtualTab Configuration File Structure
+ * Stored in .vscode/virtualTab.json or .vscode/transmitConfig.json
+ */
+export interface VirtualTabConfig {
+    /**
+     * Group definitions
+     */
+    groups?: TempGroup[];
+
+    /**
+     * Transmit targets for file transmission feature
+     */
+    transmitTargets?: TransmitTarget[];
+}

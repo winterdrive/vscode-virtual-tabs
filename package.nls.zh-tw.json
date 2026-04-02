@@ -43,5 +43,6 @@
     "command.copyGroupPaths.title": "複製檔案路徑清單",
     "config.confirmBeforeDelete.description": "刪除群組或檔案前顯示確認提示",
     "config.autoRevealActiveFile.description": "在 Virtual Tabs 視圖中自動展開並高亮當前活動檔案",
-    "command.closeFile.title": "關閉檔案"
+    "command.closeFile.title": "關閉檔案",
+    "command.transmit.title": "傳送檔案"
 }

@@ -268,6 +268,11 @@
                 "command": "virtualTabs.closeFile",
                 "title": "%command.closeFile.title%",
                 "icon": "$(close)"
+            },
+            {
+                "command": "virtualTabs.transmit",
+                "title": "%command.transmit.title%",
+                "icon": "$(cloud-upload)"
             }
         ],
         "submenus": [
@@ -453,6 +458,16 @@
                     "command": "virtualTabs.removeBookmark",
                     "when": "view == virtualTabsView && viewItem == virtualTabsBookmark",
                     "group": "inline@2"
+                },
+                {
+                    "command": "virtualTabs.transmit",
+                    "when": "view == virtualTabsView && virtualTabs:hasFileSelected && (viewItem == virtualTabsFileCustom || viewItem == virtualTabsFileBuiltIn || viewItem == virtualTabsFileCustomExec || viewItem == virtualTabsFileBuiltInExec)",
+                    "group": "9_transmit@1"
+                },
+                {
+                    "command": "virtualTabs.transmit",
+                    "when": "view == virtualTabsView && (viewItem == virtualTabsGroup || viewItem == virtualTabsGroupBuiltIn)",
+                    "group": "9_transmit@1"
                 }
             ],
             "editor/context": [

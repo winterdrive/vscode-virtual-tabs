@@ -8,6 +8,7 @@ import { TempGroup } from './types';
 import { executeWithConfirmation } from './util';
 import { SkillGenerator } from './mcp/SkillGenerator';
 import { McpConfigPanel } from './mcp/McpConfigPanel';
+import { TransmitManager } from './transmit';
 
 // Global clipboard for VirtualTabs items
 let globalClipboardItems: (TempFileItem | TempFolderItem)[] = [];
@@ -1606,6 +1607,28 @@ export function registerCommands(context: vscode.ExtensionContext, provider: Tem
                     }
                 }
             }
+        })
+    );
+
+    // Transmit files to a configured target path
+    context.subscriptions.push(
+        vscode.commands.registerCommand('virtualTabs.transmit', async (item: TempFolderItem | TempFileItem | undefined) => {
+            const targets = TransmitManager.loadTransmitTargets();
+            const target = await TransmitManager.selectTarget(targets);
+            if (!target) return;
+
+            let uris: vscode.Uri[] = [];
+            if (item instanceof TempFolderItem) {
+                // Group: transmit all files in the group
+                const group = provider.groups[item.groupIdx];
+                uris = (group?.files || []).map((f: string) => vscode.Uri.parse(f));
+            } else if (item instanceof TempFileItem) {
+                // File: transmit selected files, or the clicked file if none selected
+                const selected = provider.getSelectedFileItems();
+                uris = selected.length > 0 ? selected.map(s => s.uri) : [item.uri];
+            }
+
+            await TransmitManager.transmitFiles(uris, target);
         })
     );
 }

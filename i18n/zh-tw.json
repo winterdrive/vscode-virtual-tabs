@@ -149,5 +149,18 @@
     "context.groupLabel": "- **群組**：{0}",
     "context.fileLabel": "- **檔案**：`{0}`",
     "context.fileLabelDeduped": "- **檔案**：`{0}`（已去重）",
-    "context.bookmarkLabel": "- **書籤**：`{0}`（{1}）{2}"
+    "context.bookmarkLabel": "- **書籤**：`{0}`（{1}）{2}",
+    "transmit.error.sourceNotFound": "找不到來源檔案：{0}",
+    "transmit.error.failed": "傳送檔案 '{0}' 失敗：{1}",
+    "transmit.error.noTargets": "尚未設定傳送目標。請在 .vscode/virtualTab.json 中新增 'transmitTargets'",
+    "transmit.confirm.overwrite": "檔案 '{0}' 在 '{1}' 中已存在。是否覆寫？",
+    "transmit.button.overwrite": "覆寫",
+    "transmit.button.skip": "跳過",
+    "transmit.info.noFiles": "沒有檔案可傳送",
+    "transmit.info.cancelled": "傳送已取消。已傳送 {0} 個檔案。",
+    "transmit.info.complete": "已將 {0} / {1} 個檔案傳送至 '{2}'",
+    "transmit.progress.title": "正在傳送檔案至 '{0}'",
+    "transmit.progress.file": "({0}/{1}) {2}",
+    "transmit.quickPick.placeholder": "選擇目標位置",
+    "transmit.quickPick.title": "傳送檔案"
 }
