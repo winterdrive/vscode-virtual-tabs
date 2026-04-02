@@ -94,6 +94,40 @@ In the Extension Development Host window:
 2. Check the "Virtual Tabs" view in the Explorer panel
 3. Test various features (grouping, drag-and-drop, context menu, etc.)
 
+#### Test "Send to..." (File/Group Export)
+
+The **Send to...** feature copies selected files (or an entire group) to one or more destination folders.
+
+* Entry points:
+  * Right click a file item → **Send to...**
+  * Right click a group item → **Send to... (Include Group Folder)** / **Send to... (Exclude Group Folder)**
+* Quick Pick destinations:
+  * **Browse**: opens a folder picker and remembers the destination under **Recent**
+  * **Configured**: loads `$(rocket)` targets from `.vscode/sendTargets.json`
+  * If no configured targets exist, the Quick Pick offers **Create sendTargets.json template...** (creates and opens the file)
+
+##### `.vscode/sendTargets.json` schema
+
+Create `.vscode/sendTargets.json` in your workspace:
+
+```json
+{
+    "sendTargets": [
+        {
+            "name": "Production A",
+            "path": "D:\\\\MachineSoftware\\\\programs"
+        },
+        {
+            "name": "All Devices",
+            "path": [
+                "D:\\\\MachineSoftware\\\\programs",
+                "\\\\\\\\server01\\\\share\\\\backup"
+            ]
+        }
+    ]
+}
+```
+
 ---
 
 ## 🛠️ Technical Configuration Details
@@ -180,6 +214,7 @@ virtual-tabs/
 ├── .vscode/               # VS Code config files
 │   ├── launch.json       # Debug configuration (preLaunchTask: vscode:prepublish)
 │   └── tasks.json        # Build task configuration
+│   └── sendTargets.json  # (Optional) "Send to..." configured destinations
 ├── dist/                 # TypeScript build output
 ├── assets/               # Icons and screenshots
 │   ├── hero_banner.png   # Hero banner for README
@@ -200,6 +235,7 @@ virtual-tabs/
 │   ├── provider.ts       # TreeDataProvider implementation and group management logic
 │   ├── dragAndDrop.ts    # Drag-and-drop controller (supports files, groups, directories)
 │   ├── commands.ts       # VS Code command registration and implementation
+│   ├── sendTo.ts         # "Send to..." destination picker + file copy logic
 │   ├── i18n.ts           # Internationalization utilities
 │   ├── util.ts           # UI utility (confirmation dialogs)
 │   ├── index.ts          # Module export entry
@@ -238,6 +274,7 @@ virtual-tabs/
 | `types.ts`          | Defines shared data structures and interfaces    | `TempGroup`, `VTBookmark`, `DateGroup` |
 | `dragAndDrop.ts`    | Implements drag-and-drop controller, handles file/group/directory drag operations | `TempFoldersDragAndDropController` |
 | `commands.ts`       | Registers and implements all VS Code commands, including group, file, bookmark, and clipboard operations | `registerCommands()` |
+| `sendTo.ts`         | Implements "Send to..." destination picking, recent destinations, and file copy helpers | `SendToManager` |
 | `i18n.ts`           | Internationalization utilities                   | `I18n` |
 | `util.ts`           | UI utility: confirmation dialogs with configurable settings | `executeWithConfirmation()` |
 | **`core/`**         | **Shared business logic — single source of truth for both the VS Code extension and the MCP server** | |
@@ -287,6 +324,10 @@ The following table defines the availability of commands across different item t
 | Delete File (Disk) | ❌ | ❌ | ✔ | ❌ | ❌ |
 | Reveal in OS | ❌ | ❌ | ✔ | ✔ | ✔ |
 | Run File (Inline) | ❌ | ❌ | ✔ (.bat/.exe) | ✔ (.bat/.exe) | ❌ |
+| **[Send To...]** | | | | | |
+| Send to... | ❌ | ❌ | ✔ | ✔ | ❌ |
+| Send to... (Include Group Folder) | ✔ | ✔ | ❌ | ❌ | ❌ |
+| Send to... (Exclude Group Folder) | ✔ | ✔ | ❌ | ❌ | ❌ |
 | **[Close Operations]** | | | | | |
 | Close File (Inline) | ❌ | ❌ | ❌ | ✔ `(v0.4.6)` | ❌ |
 | Close Selected | ❌ | ❌ | ✔ | ✔ | ❌ |
