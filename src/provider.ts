@@ -326,8 +326,10 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
     }
 
     private getWorkspaceRootPath(): string | undefined {
-        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-        return workspaceFolder?.uri.fsPath;
+        if (vscode.workspace.workspaceFile) {
+            return vscode.Uri.joinPath(vscode.workspace.workspaceFile, '..').fsPath;
+        }
+        return vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     }
 
     private initBuiltInGroup() {

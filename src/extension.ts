@@ -180,8 +180,11 @@ export async function activate(context: vscode.ExtensionContext) {
     registerCommands(context, provider, stableMcpPath);
 
     // Watch for .vscode/virtualTab.json changes
-    const configPath = vscode.workspace.workspaceFolders?.[0]
-        ? new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], '.vscode/virtualTab.json')
+    const rootUri = vscode.workspace.workspaceFile
+        ? vscode.Uri.joinPath(vscode.workspace.workspaceFile, '..')
+        : vscode.workspace.workspaceFolders?.[0]?.uri;
+    const configPath = rootUri
+        ? new vscode.RelativePattern(rootUri, '.vscode/virtualTab.json')
         : null;
 
     if (configPath) {
