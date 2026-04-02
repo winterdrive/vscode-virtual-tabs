@@ -8,6 +8,7 @@ import { AutoGrouper } from './core/AutoGrouper';
 import { BookmarkManager } from './core/BookmarkManager';
 import { GroupManager, OptimisticLockError } from './core/GroupManager';
 import { PathUtils } from './core/PathUtils';
+import { getWorkspaceRootUri } from './util';
 
 /**
  * Type-safe helper to extract a URI from a VS Code Tab's input.
@@ -326,10 +327,7 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
     }
 
     private getWorkspaceRootPath(): string | undefined {
-        if (vscode.workspace.workspaceFile) {
-            return vscode.Uri.joinPath(vscode.workspace.workspaceFile, '..').fsPath;
-        }
-        return vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        return getWorkspaceRootUri()?.fsPath;
     }
 
     private initBuiltInGroup() {
