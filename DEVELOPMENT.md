@@ -644,30 +644,7 @@ npm version major  # Major version (0.0.1 → 1.0.0)
 
 ## 🤝 Contribution Guide
 
-### Development Workflow
-
-1. Fork the project and create a feature branch
-2. Follow the existing code style and architecture
-3. Add appropriate comments and documentation
-4. Test new features or fixes
-5. Submit a Pull Request
-
-### Code Style
-
-* Use TypeScript strict mode
-* Follow existing naming conventions
-* Keep comments in Traditional Chinese (per user instruction)
-* Use JSDoc comments where appropriate
-
-### Testing Checklist
-
-* [ ] TypeScript compiles without errors
-* [ ] All features work in Extension Development Host
-* [ ] Drag-and-drop works
-* [ ] Context menu works
-* [ ] Multi-file selection works
-* [ ] Auto grouping works
-* [ ] Group management works
+For detailed information on how to contribute, including the development workflow, code style guidelines, and our **AI-assisted development prompts**, please read our dedicated [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ---
 
