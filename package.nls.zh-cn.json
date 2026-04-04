@@ -46,5 +46,7 @@
     "command.closeFile.title": "关闭文件",
     "command.sendTo.title": "发送至...",
     "command.sendToIncludeGroupFolder.title": "发送至...（包含群组文件夹）",
-    "command.sendToExcludeGroupFolder.title": "发送至...（不包含群组文件夹）"
+    "command.sendToExcludeGroupFolder.title": "发送至...（不包含群组文件夹）",
+    "command.moveFileUp.title": "文件上移",
+    "command.moveFileDown.title": "文件下移"
 }

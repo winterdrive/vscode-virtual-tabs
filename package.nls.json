@@ -47,5 +47,7 @@
     "command.closeFile.title": "Close File",
     "command.sendTo.title": "Send to...",
     "command.sendToIncludeGroupFolder.title": "Send to... (Include Group Folder)",
-    "command.sendToExcludeGroupFolder.title": "Send to... (Exclude Group Folder)"
+    "command.sendToExcludeGroupFolder.title": "Send to... (Exclude Group Folder)",
+    "command.moveFileUp.title": "Move File Up",
+    "command.moveFileDown.title": "Move File Down"
 }

@@ -274,11 +274,32 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
             return groups;
         }
 
-        return groups.map(group => ({
-            ...group,
-            files: group.files ? group.files.map(pathStr => this.toAbsoluteUri(pathStr, workspaceRoot)) : group.files,
-            bookmarks: group.bookmarks ? this.fromStorageBookmarks(group.bookmarks, workspaceRoot) : group.bookmarks
-        }));
+        return groups.map(group => {
+            let files = group.files
+                ? group.files.map(pathStr => this.toAbsoluteUri(pathStr, workspaceRoot))
+                : group.files;
+
+            // Deduplicate by fsPath to fix any existing bad data
+            if (files) {
+                const seen = new Set<string>();
+                files = files.filter(f => {
+                    try {
+                        const key = process.platform === 'win32'
+                            ? vscode.Uri.parse(f).fsPath.toLowerCase()
+                            : vscode.Uri.parse(f).fsPath;
+                        if (seen.has(key)) return false;
+                        seen.add(key);
+                        return true;
+                    } catch { return true; }
+                });
+            }
+
+            return {
+                ...group,
+                files,
+                bookmarks: group.bookmarks ? this.fromStorageBookmarks(group.bookmarks, workspaceRoot) : group.bookmarks
+            };
+        });
     }
 
     private toRelativeBookmarks(bookmarks: Record<string, VTBookmark[]>, workspaceRoot: string): Record<string, VTBookmark[]> {
@@ -395,8 +416,7 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
 
     /**
      * Synchronize the built-in group ("Currently Open Files") with actual VS Code tabs.
-     * Fires tree update if the set of open files OR the editor-group distribution changed.
-     * Ignores pure ordering changes from tabpane focus shifts to prevent stealing focus.
+     * Fires tree update if the set of open files, their order, or the editor-group distribution changed.
      */
     syncBuiltInGroup(): boolean {
         let changed = false;
@@ -420,9 +440,10 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
                 }
             }
 
+            const orderChanged = setsEqual && !this.arraysEqualInOrder(oldFiles, openUris);
             const groupStructureChanged = this.hasEditorGroupStructureChanged(newEditorGroups);
 
-            if (!setsEqual || groupStructureChanged) {
+            if (!setsEqual || orderChanged || groupStructureChanged) {
                 this.builtInEditorGroups = newEditorGroups;
 
                 if (!setsEqual) {
@@ -434,6 +455,9 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
                         }
                     }
                     builtIn.files = newFilesStable;
+                } else if (orderChanged) {
+                    // Native panel was reordered — follow VS Code's order
+                    builtIn.files = openUris;
                 }
 
                 this.saveGroups();
@@ -442,6 +466,14 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
             }
         }
         return changed;
+    }
+
+    private arraysEqualInOrder(a: string[], b: string[]): boolean {
+        if (a.length !== b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+        return true;
     }
 
     refresh(save: boolean = true): void {
@@ -562,9 +594,14 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
         const group = this.groups[groupIdx];
         if (!group) return;
         if (!group.files) group.files = [];
-        // Avoid duplicates
+        // Avoid duplicates using fsPath comparison (handles URI encoding differences)
         for (const uri of uris) {
-            if (!group.files.includes(uri)) {
+            const incomingFsPath = vscode.Uri.parse(uri).fsPath;
+            const isDuplicate = group.files.some(f => {
+                try { return this.pathsEqual(vscode.Uri.parse(f).fsPath, incomingFsPath); }
+                catch { return f === uri; }
+            });
+            if (!isDuplicate) {
                 group.files.push(uri);
             }
         }
@@ -598,6 +635,79 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
 
         collect(groupId);
         return Array.from(files);
+    }
+
+    /**
+     * Reorder file inside a group via drag and drop
+     */
+    reorderFileInGroup(groupIdx: number, fileUri: string, targetUri: string | null) {
+        const group = this.groups[groupIdx];
+        if (!group || !group.files || group.builtIn) return;
+
+        // Clear sort preference inline (no intermediate refresh/save)
+        if (group.sortBy && group.sortBy !== 'none') {
+            group.sortBy = 'none';
+            group.sortOrder = 'asc';
+            vscode.window.showInformationMessage(I18n.getMessage('message.sortClearedForReorder'));
+        }
+
+        const files = [...group.files];
+        const srcFsPath = vscode.Uri.parse(fileUri).fsPath;
+        const currentIndex = files.findIndex(f => vscode.Uri.parse(f).fsPath === srcFsPath);
+        if (currentIndex === -1) return;
+
+        // Use the stored URI (not the incoming one) to preserve format consistency
+        const storedFileUri = files[currentIndex];
+
+        // Remove from current position
+        files.splice(currentIndex, 1);
+
+        if (targetUri === null) {
+            // Drop on folder -> move to end
+            files.push(storedFileUri);
+        } else {
+            // Drop on file -> insert before target
+            const tgtFsPath = vscode.Uri.parse(targetUri).fsPath;
+            const targetIndex = files.findIndex(f => vscode.Uri.parse(f).fsPath === tgtFsPath);
+            if (targetIndex !== -1) {
+                files.splice(targetIndex, 0, storedFileUri);
+            } else {
+                files.push(storedFileUri);
+            }
+        }
+
+        group.files = files;
+        this.refresh();
+    }
+
+    /**
+     * Move file up/down via keyboard shortcuts
+     */
+    moveFileInGroup(groupIdx: number, fileUri: string, direction: 'up' | 'down') {
+        const group = this.groups[groupIdx];
+        if (!group || !group.files || group.builtIn) return;
+
+        // Clear sort preference inline (no intermediate refresh/save)
+        if (group.sortBy && group.sortBy !== 'none') {
+            group.sortBy = 'none';
+            group.sortOrder = 'asc';
+            vscode.window.showInformationMessage(I18n.getMessage('message.sortClearedForReorder'));
+        }
+
+        const files = group.files;
+        const targetFsPath = vscode.Uri.parse(fileUri).fsPath;
+        const currentIndex = files.findIndex(f => vscode.Uri.parse(f).fsPath === targetFsPath);
+        if (currentIndex === -1) return;
+
+        if (direction === 'up' && currentIndex > 0) {
+            // Swap with previous
+            [files[currentIndex - 1], files[currentIndex]] = [files[currentIndex], files[currentIndex - 1]];
+            this.refresh();
+        } else if (direction === 'down' && currentIndex < files.length - 1) {
+            // Swap with next
+            [files[currentIndex + 1], files[currentIndex]] = [files[currentIndex], files[currentIndex + 1]];
+            this.refresh();
+        }
     }
 
     // One-click open all files in group (only for custom groups)

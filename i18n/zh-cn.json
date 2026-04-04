@@ -169,5 +169,6 @@
     "sendTo.quickPick.recentSection": "最近使用",
     "sendTo.browse.selectButton": "发送到此处",
     "sendTo.template.noWorkspace": "请先打开文件夹/工作区。",
-    "sendTo.template.created": "已创建 .vscode/sendTargets.json 模板。"
+    "sendTo.template.created": "已创建 .vscode/sendTargets.json 模板。",
+    "message.sortClearedForReorder": "已自动清除排序设置，以便进行手动排序。"
 }

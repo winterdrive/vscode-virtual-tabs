@@ -169,5 +169,6 @@
     "sendTo.quickPick.recentSection": "Recent",
     "sendTo.browse.selectButton": "Send Here",
     "sendTo.template.noWorkspace": "Please open a folder/workspace first.",
-    "sendTo.template.created": "Created .vscode/sendTargets.json template."
+    "sendTo.template.created": "Created .vscode/sendTargets.json template.",
+    "message.sortClearedForReorder": "Sort preference cleared to allow manual file ordering."
 }

@@ -254,7 +254,7 @@ function resolveGroupItem(
 }
 
 // VirtualTabs command registration
-export function registerCommands(context: vscode.ExtensionContext, provider: TempFoldersProvider, stableMcpPath?: string): void {
+export function registerCommands(context: vscode.ExtensionContext, provider: TempFoldersProvider, getLastSelectedCustomFile: () => TempFileItem | undefined, stableMcpPath?: string): void {
     // Run executable file in terminal (explicit action via inline button)
     context.subscriptions.push(vscode.commands.registerCommand('virtualTabs.runFile', async (target?: FileCommandTarget) => {
         const uri = getFileUri(target);
@@ -301,6 +301,20 @@ export function registerCommands(context: vscode.ExtensionContext, provider: Tem
     context.subscriptions.push(vscode.commands.registerCommand('virtualTabs.moveGroupDown', (item: TempFolderItem) => {
         if (item && item.groupId) {
             provider.moveGroup(item.groupId, 'down');
+        }
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('virtualTabs.moveFileUp', (item?: TempFileItem) => {
+        const target = item instanceof TempFileItem ? item : getLastSelectedCustomFile();
+        if (target) {
+            provider.moveFileInGroup(target.groupIdx, target.uri.toString(), 'up');
+        }
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('virtualTabs.moveFileDown', (item?: TempFileItem) => {
+        const target = item instanceof TempFileItem ? item : getLastSelectedCustomFile();
+        if (target) {
+            provider.moveFileInGroup(target.groupIdx, target.uri.toString(), 'down');
         }
     }));
 

@@ -2,7 +2,7 @@
     "name": "virtual-tabs",
     "displayName": "%extension.displayName%",
     "description": "%extension.description%",
-    "version": "0.4.8",
+    "version": "0.4.9",
     "publisher": "winterdrive",
     "icon": "docs/assets/virtualtabs_icon_128.png",
     "categories": [
@@ -283,6 +283,14 @@
                 "command": "virtualTabs.sendToExcludeGroupFolder",
                 "title": "%command.sendToExcludeGroupFolder.title%",
                 "icon": "$(cloud-upload)"
+            },
+            {
+                "command": "virtualTabs.moveFileUp",
+                "title": "%command.moveFileUp.title%"
+            },
+            {
+                "command": "virtualTabs.moveFileDown",
+                "title": "%command.moveFileDown.title%"
             }
         ],
         "submenus": [
@@ -483,6 +491,16 @@
                     "command": "virtualTabs.sendToExcludeGroupFolder",
                     "when": "view == virtualTabsView && (viewItem == virtualTabsGroup || viewItem == virtualTabsGroupBuiltIn)",
                     "group": "9_sendTo@3"
+                },
+                {
+                    "command": "virtualTabs.moveFileUp",
+                    "when": "view == virtualTabsView && (viewItem == virtualTabsFileCustom || viewItem == virtualTabsFileCustomExec)",
+                    "group": "3_organize@0.2"
+                },
+                {
+                    "command": "virtualTabs.moveFileDown",
+                    "when": "view == virtualTabsView && (viewItem == virtualTabsFileCustom || viewItem == virtualTabsFileCustomExec)",
+                    "group": "3_organize@0.3"
                 }
             ],
             "editor/context": [
@@ -572,6 +590,16 @@
                 "command": "virtualTabs.renameGroup",
                 "key": "f2",
                 "when": "focusedView == virtualTabsView && listFocus"
+            },
+            {
+                "command": "virtualTabs.moveFileUp",
+                "key": "alt+up",
+                "when": "virtualTabs:hasCustomFileSelected && !editorTextFocus"
+            },
+            {
+                "command": "virtualTabs.moveFileDown",
+                "key": "alt+down",
+                "when": "virtualTabs:hasCustomFileSelected && !editorTextFocus"
             }
         ]
     },

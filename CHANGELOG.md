@@ -2,6 +2,20 @@
 
 All notable changes to the "VirtualTabs" extension will be documented in this file.
 
+## [0.4.9] - 2026-04-04
+
+> **Special Thanks**: [@onelaview](https://github.com/onelaview) for the original idea! 🎉
+
+### Added
+
+- **File Reordering in Custom Groups**: Files within a custom group can now be reordered via drag & drop, `Alt+↑` / `Alt+↓` keyboard shortcuts, or the right-click context menu (**Move File Up** / **Move File Down**).
+- **Native Open Editors → VT Sync**: Reordering tabs in the native Open Editors panel now automatically updates the order in the VirtualTabs built-in group.
+
+### Fixed
+
+- Fixed duplicate file detection when adding files to a group. URI encoding differences on Windows (`d%3A` vs `d:`) could cause the same file to be added twice.
+- Fixed file reordering (both drag & drop and keyboard) silently failing on Windows due to the same URI encoding mismatch.
+
 ## [0.4.8] - 2026-04-03
 
 > **Special Thanks**: [@jianfulin](https://github.com/jianfulin) for the original idea and contribution! 🎉

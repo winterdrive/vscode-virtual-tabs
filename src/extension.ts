@@ -94,16 +94,20 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    // Update context key based on selection
+    // Update context key based on selection; also track last selected custom file for keybindings
+    let lastSelectedCustomFile: TempFileItem | undefined;
     treeView.onDidChangeSelection(e => {
         const hasFile = e.selection.some(item => item instanceof TempFileItem);
-        const hasCustomFile = e.selection.some(item =>
+        const customFileItem = e.selection.find((item): item is TempFileItem =>
             item instanceof TempFileItem &&
-            item.contextValue &&
+            !!item.contextValue &&
             item.contextValue.includes('virtualTabsFileCustom')
         );
+        if (customFileItem) {
+            lastSelectedCustomFile = customFileItem;
+        }
         vscode.commands.executeCommand('setContext', 'virtualTabs:hasFileSelected', hasFile);
-        vscode.commands.executeCommand('setContext', 'virtualTabs:hasCustomFileSelected', hasCustomFile);
+        vscode.commands.executeCommand('setContext', 'virtualTabs:hasCustomFileSelected', !!customFileItem);
     });
 
 
@@ -177,7 +181,7 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     // Register all commands
-    registerCommands(context, provider, stableMcpPath);
+    registerCommands(context, provider, () => lastSelectedCustomFile, stableMcpPath);
 
     // Watch for .vscode/virtualTab.json changes
     const configPath = vscode.workspace.workspaceFolders?.[0]

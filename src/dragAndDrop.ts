@@ -62,21 +62,25 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
 
     async handleDrop(target: vscode.TreeItem | undefined, dataTransfer: vscode.DataTransfer, token: vscode.CancellationToken): Promise<void> {
         // Priority 1: Check if this is an internal file move (WE set this manually in handleDrag)
+        // IMPORTANT: Always validate the type of fileData.value before using it,
+        // because VS Code's DataTransfer may serialize/deserialize the value across boundaries.
         const fileData = dataTransfer.get('application/vnd.code.tree.virtualTabsView.files');
+        const draggedFiles = this.extractDraggedFiles(fileData);
 
-        if (fileData) {
-            const draggedFiles = fileData.value as TempFileItem[];
+        if (draggedFiles && draggedFiles.length > 0) {
             // Try determine target group
             const targetGroup = this.determineTargetGroup(target);
             if (targetGroup) {
-                await this.handleFileDrop(draggedFiles, targetGroup);
+                await this.handleFileDrop(draggedFiles, targetGroup, target);
                 return;
             }
         }
 
         // Priority 2: Check for external file drag (uri-list)
+        // Condition: uri-list exists AND we did NOT successfully extract internal file items
+        // Note: We do NOT use `!fileData` because fileData may exist but contain an invalid/serialized value
         const uriList = dataTransfer.get('text/uri-list');
-        if (uriList && !fileData) { // Only process if not valid internal file move
+        if (uriList && !draggedFiles) {
             const targetGroup = this.determineTargetGroup(target);
             if (targetGroup) {
                 // Fix: support both \n and \r\n, trim whitespace and control characters from each URI
@@ -132,6 +136,26 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
         }
     }
 
+    /**
+     * Safely extract TempFileItem[] from a DataTransferItem.
+     * Returns null if the value is not a valid TempFileItem array
+     * (e.g. when VS Code serializes the value across the webview boundary).
+     */
+    private extractDraggedFiles(fileData: vscode.DataTransferItem | undefined): TempFileItem[] | null {
+        if (!fileData) return null;
+
+        const value = fileData.value;
+
+        // Must be a non-empty array
+        if (!Array.isArray(value) || value.length === 0) return null;
+
+        // Every element must be a TempFileItem instance
+        const allAreFileItems = value.every(item => item instanceof TempFileItem);
+        if (!allAreFileItems) return null;
+
+        return value as TempFileItem[];
+    }
+
     private determineTargetGroup(target: vscode.TreeItem | undefined): TempFolderItem | undefined {
         if (target instanceof TempFolderItem) {
             return target;
@@ -152,8 +176,8 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
     /**
      * Handle dropping file(s) onto a group (move files between groups)
      */
-    private async handleFileDrop(draggedFiles: TempFileItem[], target: TempFolderItem): Promise<void> {
-        const targetGroup = this.provider.groups[target.groupIdx];
+    private async handleFileDrop(draggedFiles: TempFileItem[], targetGroupItem: TempFolderItem, target?: vscode.TreeItem): Promise<void> {
+        const targetGroup = this.provider.groups[targetGroupItem.groupIdx];
         if (!targetGroup) return;
 
         for (const fileItem of draggedFiles) {
@@ -162,8 +186,13 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
 
             const fileUri = fileItem.uri.toString();
 
-            // Skip if dropping onto the same group
-            if (fileItem.groupIdx === target.groupIdx) continue;
+            // Reorder inside the same group
+            if (fileItem.groupIdx === targetGroupItem.groupIdx) {
+                // target here is the ORIGINAL drop target (TempFileItem or TempFolderItem), not the derived targetGroupItem
+                const targetUri = (target instanceof TempFileItem) ? target.uri.toString() : null;
+                this.provider.reorderFileInGroup(fileItem.groupIdx, fileUri, targetUri);
+                continue;
+            }
 
             // 1. Move Bookmarks
             if (sourceGroup.bookmarks && sourceGroup.bookmarks[fileUri]) {
@@ -187,9 +216,14 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
                 sourceGroup.files = sourceGroup.files.filter(uri => uri !== fileUri);
             }
 
-            // Add to target group
+            // Add to target group (fsPath comparison to handle URI encoding differences)
             if (!targetGroup.files) targetGroup.files = [];
-            if (!targetGroup.files.includes(fileUri)) {
+            const incomingFsPath = vscode.Uri.parse(fileUri).fsPath;
+            const alreadyExists = targetGroup.files.some(f => {
+                try { return vscode.Uri.parse(f).fsPath === incomingFsPath; }
+                catch { return f === fileUri; }
+            });
+            if (!alreadyExists) {
                 targetGroup.files.push(fileUri);
             }
         }

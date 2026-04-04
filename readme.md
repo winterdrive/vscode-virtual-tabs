@@ -5,7 +5,7 @@
 [![Rating](https://img.shields.io/visual-studio-marketplace/r/winterdrive.virtual-tabs?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=winterdrive.virtual-tabs)
 [![AI-Ready Context](https://img.shields.io/badge/AI--Ready-LLMS.txt-blue?style=flat-square)](https://winterdrive.github.io/VirtualTabs/llms.txt)
 
-[繁體中文](./README.zh-TW.md) | [English](./readme.md)
+[繁體中文](./README.zh-TW.md)
 
 ![VirtualTabs - VS Code File Grouping and AI Context Extension](docs/assets/vscode-virtualtabs-grouping-banner.png)
 
@@ -62,8 +62,6 @@ In the era of Copilot and LLMs, **precise context** is the key to high-quality r
 - **Reduced Noise**: Isolate core logic to help AI focus and prevent hallucinations.
 - **Persistent Context**: Your curated AI prompts and file sets stay ready even after a restart.
 
-> *"VirtualTabs helps me define the exact boundary of what the AI should see."*
-
 ---
 
 ## ✨ Key Features
@@ -79,6 +77,8 @@ In the era of Copilot and LLMs, **precise context** is the key to high-quality r
 - **🔌 AI Agent Integration (MCP)** — Connect AI agents (Cursor, Copilot, Claude, Kiro, Antigravity) to manage your groups programmatically `(v0.4.0)`
 - **🎯 Auto Reveal & Sync** — Automatically focus the active file and sync with editor groups `(v0.4.5)`
 - **❌ Inline Close Button** — Close editor tabs directly from the VirtualTabs view `(v0.4.6)`
+- **🚀 Send to...** — Send selected files or entire groups to configured destinations `(v0.4.8)`
+- **⇵ File Reordering** — Drag & drop or use `Alt+↑/↓` to reorder files within custom groups `(v0.4.9)`
 
 ### ⚡ Workflow Boosters
 
@@ -92,16 +92,14 @@ In the era of Copilot and LLMs, **precise context** is the key to high-quality r
 
 ## ⚡ Latest Highlights
 
-**v0.4.6** introduces the **Close File** button and architectural refinements:
+**v0.4.9** introduces **File Reordering** within custom groups:
 
-- ❌ **Inline Close Button** — A new `$(close)` icon appears on hover for every file item. Close editor tabs directly from VirtualTabs without switching panels.
-- 🏗️ **Editor Group Clustering** — When multiple editors are split, the "Currently Open Files" group now clusters tabs by their group index, providing a perfect structural map of your workspace.
-- 🔧 **Unique Node IDs** — Fixed a core TreeView collision issue, ensuring stable performance even when the same file is open in multiple groups.
+- ⇵ **Drag & Drop within groups** — Drag a file to a new position inside its custom group to reorder it.
+- ⌨️ **Keyboard shortcuts** — Use `Alt+↑` / `Alt+↓` to move the selected file up or down (requires VT panel focus; click the group name first).
+- 🖱️ **Context menu** — Right-click any file → **Move File Up** / **Move File Down**.
+- 🔄 **Native sync (one-way)** — Reordering tabs in the native Open Editors panel is now reflected in the VirtualTabs Built-in group automatically.
 
-**v0.4.5** brought **Auto Reveal** and active tracking:
-
-- 🎯 **Auto Reveal Active File** — The tree view automatically scrolls to and highlights the file you are currently editing.
-- ⚙️ **Configurable Reveal** — Toggle the auto-reveal behavior via `virtualTabs.autoRevealActiveFile`.
+👉 See [CHANGELOG.md](./CHANGELOG.md) for previous release notes.
 
 ---
 
@@ -124,21 +122,6 @@ VirtualTabs provides full AI agent integration — let your AI assistant manage 
 | Configure MCP in Cursor settings | Configure MCP in Antigravity environment | Configure MCP in Kiro IDE |
 
 > Use the **MCP Config Panel** (command: `VirtualTabs: Show MCP Config`) to generate ready-to-paste configuration for your chosen AI tool.
-
-**v0.3.6** introduced powerful multi-select copy & system improvements:
-
-![Copy Menu Demo](docs/assets/copy_menu_demo.png)
-
-- 🎯 **Multi-select Copy Support (Core Update)** — Select multiple files or groups and copy everything at once.
-  - One-click copy for: File Names, Relative Paths, and Absolute Paths.
-  - Enhanced "Copy Context for AI" handles mixed selections (files + groups + bookmarks) with automatic content deduplication.
-- 🎨 **Smart Unified Menu** — Replaced redundant menus with a single, intelligent copy submenu.
-- 🔧 **Enhanced Reliability** — Implemented robust cycle detection and improved type safety using `instanceof` checks for smoother performance in large projects.
-
-**v0.3.3** enhanced user experience:
-
-- ⚙️ **Configurable Confirmations** — Toggle delete confirmation dialogs via settings.
-- 🌍 **Better i18n** — Fully localized messages for English, Traditional Chinese, and Simplified Chinese.
 
 ---
 
@@ -206,7 +189,14 @@ Everything you need in one place. Right-click any file or group:
 
 - **Sort**: Right-click group → **Sort Files** (Name, Path, Extension, Date).
 - **Auto-Group**: Right-click group → **Auto Group by Extension/Date**.
-- **Reorder**: Use Right-click → **Move Up/Down** to manually order groups.
+- **Reorder groups**: Right-click → **Move Up/Down** to manually order groups.
+- **Reorder files**: Drag a file within a custom group, or use `Alt+↑` / `Alt+↓` (click the group name first to give the panel focus), or right-click → **Move File Up/Down**.
+
+### 🚀 Send to... (v0.4.8)
+
+- Right-click selected files or a group → **Send to...** → choose a destination via Quick Pick.
+- Define fixed destinations in `.vscode/sendTargets.json` for one-click sending.
+- Recent browse destinations are remembered automatically.
 
 ---
 
@@ -251,7 +241,7 @@ It reads all files in the group (including sub-groups), formats them as markdown
 
 ### Q4: Can I share my groups with my team?
 
-Currently, groups are saved in `workspaceState` (local) or `.vscode/virtualTab.json` (shareable). v0.3.2 introduced support for `.vscode` storage!
+Yes! Groups are saved to `.vscode/virtualTab.json` in your workspace. Commit this file to share your group structure with your team.
 
 ### Q5: Do bookmarks work across file renames?
 
@@ -284,7 +274,7 @@ Interested in code contributions? Please check **[DEVELOPMENT.md](./DEVELOPMENT.
 
 ---
 
-## 🤝 Recommended Companion
+## 🔥 Recommended Companion
 
 ### 🔥 Quick Prompt
 
@@ -304,20 +294,6 @@ Get Quick Prompt on [**VS Code Marketplace**](https://marketplace.visualstudio.c
 ## 📅 Changelog
 
 👉 See [CHANGELOG.md](./CHANGELOG.md) for full release history.
-
-### ✅ v0.4.0 (Latest)
-
-- 🔌 **MCP Server** — Bundled MCP server enabling AI agents to manage groups via the Model Context Protocol
-- 🛡️ **Agent Skill Generation** — Generates target-specific skill files for Cursor, Copilot, Claude, Kiro, and Antigravity
-- ⚙️ **MCP Config Panel** — One-click config snippet for every supported AI client
-- 📦 **Bundled CLI Fallback** — Self-contained `vt.bundle.js` as a last-resort editing path when MCP is unavailable
-
-### v0.3.6
-
-- 🎯 **Multi-select Copy Support** — All copy commands now support selecting multiple files/groups
-- 🎨 **Unified Copy Menu** — Consolidated 4 duplicate submenus into one smart menu
-- 🔧 **Enhanced Reliability** — Improved type safety with `instanceof` checks and Set-based cycle detection
-- 🐛 **Bug Fixes** — Fixed command namespace conflicts and bookmark context handling
 
 ---
 
