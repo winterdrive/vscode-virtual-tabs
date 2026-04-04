@@ -170,8 +170,7 @@ VirtualTabs 透過 **Model Context Protocol (MCP)** 提供完整的 AI Agent 整
 
 我們熱烈歡迎社群貢獻！請查看 **[DEVELOPMENT.md](./DEVELOPMENT.md)** 了解開發環境設定與除錯指南。
 
-- 🐞 [Bug 回報](https://github.com/winterdrive/virtual-tabs/issues)
-- ✨ [Feature Requests](https://github.com/winterdrive/virtual-tabs/discussions)
+- 🐞 [Bug 回報/功能建議](https://github.com/winterdrive/virtual-tabs/issues)
 
 ---
 

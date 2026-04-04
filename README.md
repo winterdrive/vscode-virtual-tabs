@@ -170,8 +170,7 @@ Yes, right-click any group and use the **Move Up/Down** commands.
 
 We welcome community contributions! Please check **[DEVELOPMENT.md](./DEVELOPMENT.md)** for environment setup and debugging guides.
 
-- 🐞 [Bug Reports](https://github.com/winterdrive/virtual-tabs/issues)
-- ✨ [Feature Requests](https://github.com/winterdrive/virtual-tabs/discussions)
+- 🐞 [Bug Reports/Feature Requests](https://github.com/winterdrive/virtual-tabs/issues)
 
 ---
 
