@@ -1,11 +1,7 @@
 # VirtualTabs Full Context Documentation
 > This file contains the complete text of all key documentation for VirtualTabs, intended for use by AI agents and LLMs.
-> **v0.4.0 Highlight**: VirtualTabs now ships a bundled MCP Server for AI agent integration. Generate Agent Skills for Cursor, Copilot, Claude, Kiro, and Antigravity. Let your AI assistant manage file groups programmatically via the Model Context Protocol.
 
 ---
-# README
-[VirtualTabs readme](https://raw.githubusercontent.com/winterdrive/VirtualTabs/main/readme.md)
-
 # VirtualTabs – VS Code Extension for Virtual Tabs & Custom File Grouping
 
 [![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/winterdrive.virtual-tabs)](https://marketplace.visualstudio.com/items?itemName=winterdrive.virtual-tabs)
@@ -13,7 +9,7 @@
 [![Rating](https://img.shields.io/visual-studio-marketplace/r/winterdrive.virtual-tabs?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=winterdrive.virtual-tabs)
 [![AI-Ready Context](https://img.shields.io/badge/AI--Ready-LLMS.txt-blue?style=flat-square)](https://winterdrive.github.io/VirtualTabs/llms.txt)
 
-[繁體中文](./README.zh-TW.md) | [English](./readme.md)
+[繁體中文](./README.zh-TW.md)
 
 ![VirtualTabs - VS Code File Grouping and AI Context Extension](docs/assets/vscode-virtualtabs-grouping-banner.png)
 
@@ -21,7 +17,7 @@
 
 ## 🚀 What is VirtualTabs?
 
-**VirtualTabs is a VS Code extension that allows developers to organize files into persistent, custom virtual tab groups across directories, backed by a bundled MCP Server for AI agent integration.** Unlike standard tabs, VirtualTabs helps you build **AI-ready coding contexts**, generate **Agent Skills for AI tools** (Cursor, Copilot, Claude, Kiro, Antigravity), and manage groups programmatically. It is designed to improve navigation for large monorepos and enhance task-based workflows with AI assistance.
+**VirtualTabs is a VS Code extension that provides custom "Virtual File Directories" outside of your native file system.** Unlike standard directories, VirtualTabs helps you create **independent logical file groups** based on your current development theme, while also providing **AI-Ready Coding Context** for quick copying. It is perfectly suited for Monorepo projects or large-scale applications using MVVM or MVC architectures.
 
 ---
 
@@ -33,52 +29,31 @@
 | **Grouping** | Folder-based only | **Logic-based** (Cross-directory support) |
 | **AI Context** | Hard to gather manually | **One-click context generation** for LLMs |
 
----
+![VirtualTabs vs Physical File System](docs/assets/virtual_vs_physical_concept.png)
 
-## ✨ Key Features
+### 🧩 Solving Modern Workflow Pain Points
 
-### Core Capabilities
+In MVC/MVVM or large-scale projects, related files are often scattered across deep directory structures, making switching a repetitive chore:
 
-- **🔌 AI Agent Integration (MCP)** — Connect AI agents (Cursor, Copilot, Claude, Kiro, Antigravity) via bundled MCP Server to manage groups programmatically `(v0.4.0)`
-- **🛡️ Agent Skill Generation** — Generate target-specific skill files (`.mdc` for Cursor, `SKILL.md` for others) with safety decision trees `(v0.4.0)`
-- **⚙️ MCP Config Panel** — One-click MCP configuration export for your AI tool `(v0.4.0)`
-- **📂 Cross-Directory Grouping** — Organize files from anywhere, breaking free from folder constraints
-- **🔖 Task-Oriented Bookmarks** — Mark specific lines of code within your groups for quick navigation `(v0.2.0)`
-- **📂 Sub-Groups & Nesting** — Create hierarchical structures for better organization `(v0.3.0)`
-- **🤖 AI Context Export** — One-click copy all files as LLM-ready context `(v0.3.0)`
-- **▶️ Script Execution** — Inline run button for `.bat` and `.exe` files `(v0.3.2)`
-- **💾 Portable Config** — Settings saved to `.vscode/virtualTab.json` for team sharing `(v0.3.2)`
+```text
+❌ Traditional File Structure:
+├── config.json          (Root Config)
+├── styles/theme.css     (Style Layer)
+├── src/components/      (View Layer)
+├── tests/__tests__/     (Testing Layer)
 
-### ⚡ Workflow Boosters
-
-- **📋 Smart Copy Menu** — Unified copy options for files and groups `(v0.3.0)`
-- **📁 Directory Drag & Drop** — Drag folders to add all files recursively `(v0.3.0)`
-- **✂️ Full Clipboard Operations** — Cut/Copy/Paste support for files and groups `(v0.3.0)`
-- **⇵ Group Reordering** — Easily move groups up and down via context menu `(v0.3.2)`
-- **📊 Smart Organization** — Auto-group by extension, date, or sort by various criteria
-
----
-
-## 🚀 Latest Highlights
-
-**v0.4.0** brings full AI agent integration — let your AI assistant manage VirtualTabs groups directly:
-
-- 🔌 **MCP Server Integration** — A fully bundled MCP server (`dist/mcp/index.js`) ships with the extension, exposing 15+ tools for AI agents to create groups, manage files, handle bookmarks, and explore the project.
-- 🛡️ **Agent Skill Generation** — One command generates a tailored skill file for your AI tool (Cursor `.mdc`, or `SKILL.md` for Copilot, Claude, Antigravity, Kiro). Includes a four-layer safety decision tree and a CRITICAL CONCEPT warning that VirtualTabs groups are *purely virtual* — no files are ever moved on disk.
-- ⚙️ **MCP Config Panel** — Get ready-to-paste MCP server configuration for your AI tool with a single click.
-- 📦 **Bundled CLI Fallback** (`vt.bundle.js`) — A self-contained CLI co-located with each generated skill file provides a last-resort editing path when MCP tools are unavailable.
-
-**v0.3.3** enhances user experience:
-
-- ⚙️ **Configurable Confirmations** — Control delete confirmation dialogs via settings
-- 🌍 **Better i18n** — Confirmation messages now fully localized
-- 🔧 **Code Quality** — Refactored confirmation logic for maintainability
-
-**v0.3.2** brought productivity boosters:
-
-- 🎯 **Run Scripts Inline** — Execute `.bat` and `.exe` files with one click
-- ⇵ **Reorder Groups** — Move groups up/down to prioritize your workflow
-- 💾 **Team Sharing** — Config now saved in `.vscode/virtualTab.json`
+✅ Theme-Based Virtual Directory:
+📁 Feature: Theme System
+  ├── 📁📚 Configuration
+  │   └── config.json
+  ├── 📁📚 Style Definitions
+  │   └── theme.css
+  ├── 📁📚 Components (View Layer)
+  │   └── ThemeProvider.tsx
+  │     └── 🔖 Line 45: Context setup
+  └── 📁📚 Unit Tests (Logic/Testing)
+  │   └── theme.test.ts
+```
 
 ---
 
@@ -86,1059 +61,152 @@
 
 ### Installation
 
-1. Open VS Code
-2. Press `Ctrl+Shift+X` (or `Cmd+Shift+X`)
-3. Search for **VirtualTabs** and click Install
+1. Open VS Code.
+2. Press `Ctrl+Shift+X` (or `Cmd+Shift+X`).
+3. Search for **VirtualTabs** and click **Install**.
 
 ### First Time Setup
 
-1. Click the **VirtualTabs** icon in the Activity Bar (left sidebar)
-2. Right-click in the panel → **Create New Group**
-3. Drag files into your group
-4. Right-click the group → **Auto Group by Extension** (optional)
-
-### Basic Operations
-
-#### Creating Groups
-
-- Right-click in the VirtualTabs panel → **Create New Group**
-- Name your group (e.g., "AI Context", "Feature: Auth", "Bug Fix #123")
-- Right-click any group → **Add Sub-Group** for nested organization
-- **Open/Close All**: Includes files in sub-groups recursively.
-
-![Nested Groups](docs/assets/nested_groups_demo.png)
-
-#### Adding Files
-
-- **Drag & Drop Files**: Drag files from Explorer into a group
-- **Drag & Drop Folders**: Drag folders to add all files recursively (v0.3.0)
-- **Multi-select**: Hold `Ctrl` (or `Cmd`) and click files, then drag together
-- **Currently Open**: The built-in group auto-syncs with your open tabs
-
-![Drag & Drop Demo](docs/assets/drag_drop_demo.png)
-
-#### Using Bookmarks (v0.2.0)
-
-1. Right-click any line in the editor → **Add Bookmark to VirtualTabs**
-2. The bookmark appears under the file in the sidebar
-3. Click the bookmark to jump to that exact line
-4. Right-click the bookmark → **Edit Label** or **Edit Description**
-
-#### AI Context Export (v0.3.0)
-
-![AI Context Export](docs/assets/ai_context_demo.png)
-
-1. Right-click a group → **Copy...** → **Copy Context for AI**
-2. Paste directly into ChatGPT, Claude, or any LLM
-3. All files are formatted with proper code blocks
-
-**Unified Copy Menu:**
-
-![Copy Menu Options](docs/assets/copy_menu_demo.png)
-
-All copy operations are available in one convenient submenu, with smart behavior for both groups and files.
-
-**Smart Features:**
-
-- Skips binary files automatically
-- Opens in editor if content > 50KB
-- Includes all sub-group files recursively
-
-#### Sorting Files (v0.1.0)
-
-- Right-click a group → **Sort Files** submenu
-- Choose: Name, Path, Extension, or Modified Time
-- Toggle ascending/descending order
-- Each group remembers its own sort preference
+1. Click the **VirtualTabs icon** in the Activity Bar (left sidebar).
+2. Right-click in the panel → **Create New Group**.
+3. **Drag files** from Explorer into your group.
 
 ---
 
-## 💡 Why Choose VirtualTabs?
+## ✨ Key Features
 
-### 🧩 Solves Real Workflow Problems
+### 📁 Core Capabilities
 
-In large projects, related files are scattered across directories:
+- **Cross-Directory Grouping** — Organize files from anywhere, breaking free from folder constraints.
+- **Task-Oriented Bookmarks** — Mark specific lines of code within your groups for quick navigation.
+- **Sub-Groups & Nesting** — Create hierarchical structures for better organization.
+- **AI Context Export** — One-click copy all files as LLM-ready context.
+- **Portable Config** — Settings saved to `.vscode/virtualTab.json` for team sharing.
+- **AI Agent Integration (MCP)** — Connect AI agents (Cursor, Claude, etc.) to manage groups programmatically.
+- **Auto Reveal & Sync** — Automatically focus active files and sync with native editor groups.
+- **Send to...** — Quickly send selected files or groups to pre-configured destinations.
+- **File Reordering** — Custom manual ordering via Drag & Drop or keyboard shortcuts.
 
-```text
-❌ Without VirtualTabs:
-├── config.json          (root)
-├── styles/theme.css     (styles folder)
-├── src/components/      (components)
-└── tests/__tests__/     (tests)
+### ⚡ Workflow Boosters
 
-✅ With VirtualTabs:
-📁 Feature: Theme System
-  ├── 📁📚 Config Files
-  │   └── config.json
-  ├── 📁📚 Styles
-  │   └── theme.css
-  ├── 📁📚 Components
-  │   └── ThemeProvider.tsx
-  │     └── 🔖 Line 45: Context setup
-  └── 📁📚 Tests
-      └── theme.test.ts
-```
+- **Smart Copy Menu** — Unified copy options for names, paths, and total file content.
+- **Directory Drag & Drop** — Drag folders to add all files recursively.
+- **Clipboard Operations** — Full Cut/Copy/Paste support for files and groups.
+- **Smart Organization** — Auto-group by extension, date, or sort by various criteria.
 
-### 🤖 Perfect for AI-Assisted Coding
+---
 
-**Context is King** in the era of Copilot and LLMs:
+## 📖 User Guide
 
-- **Curated Context**: Create groups with *only* the relevant files for a task
-- **One-Click Export**: Copy all files as AI-ready markdown (v0.3.0)
-- **Reduced Noise**: Help AI focus by isolating the exact files needed
-- **Persistent Prompts**: Keep a "Context Group" ready when you return to a task
+### 📁 Group Management
 
-> *"VirtualTabs helps me define the exact boundary of what the AI should look at."*
+- **Create/Rename**: Right-click panel or groups to manage.
+- **Sub-Groups**: Right-click a group → **Add Sub-Group** (or drag one group into another).
+- **Auto-Sync**: The built-in "Open Editors" group automatically tracks your native tabs.
+- **Drag & Drop**:
+  - **Files**: Drag files from Explorer into groups.
+  - **Folders**: Drag folders to recursively add all files inside.
+  - **Multi-select**: Hold `Ctrl/Cmd` to drag multiple files at once.
 
-### 🎯 Use Cases
+![Drag and Drop Demo](docs/assets/drag_drop_demo.png)
 
-- **Cross-directory management**: Group config, styles, and source code together
-- **Feature-based development**: Organize by module or functionality
-- **AI Context Curation**: Build precise file sets for LLMs with one-click export
-- **Code Review**: Centralize files for review efficiency
-- **Teaching & Reference**: Create curated examples without folder interference
+### 🔖 Task-Oriented Bookmarks
+
+1. Right-click **any line of code** → **Add Bookmark to VirtualTabs**.
+2. The bookmark appears nested under the file in your group.
+3. Click to jump instantly to that exact line.
+4. Edit label/description to document *why* this line is important.
+
+![Bookmarks Feature](docs/assets/bookmarks_feature.png)
+
+### 🤖 AI Context Export
+
+**The "Killer Feature" for LLM workflows.**
+
+1. Setup a group with all relevant files for your current task.
+2. Right-click the group → **Copy...** → **Copy Context for AI**.
+3. Paste into ChatGPT/Claude.
+    - **Smart**: Binary files are skipped; large files (>50KB) are flagged for review.
+    - **Clean**: All code is formatted in markdown blocks with file paths.
+
+![AI Context Demo](docs/assets/ai_context_demo.png)
+
+---
+
+## 🤖 Smart AI Agent Integration (MCP)
+
+VirtualTabs provides full AI agent integration via the **Model Context Protocol (MCP)**. Let your AI assistant (Cursor, Antigravity, Kiro, etc.) manage your workspace groups programmatically.
+
+- 🔌 **Standardized Tools**: Exposes 15+ tools for creating groups and explore the project.
+- 🛡️ **Safety Mode**: Features a four-layer safety decision tree to prevent unintended disk changes.
+
+  ![Safety Decision Tree](docs/assets/safety_decision_tree_en.png)
+
+- ⚙️ **Easy Config**: Use the **MCP Config Panel** (command: `VirtualTabs: Show MCP Config`) to get ready-to-paste settings.
+
+👉 **See the [MCP Setup Guide](./docs/mcp-setup.md) for detailed IDE configuration.**
 
 ---
 
 ## 💡 Best Practices
 
-1. **Group by Task, Not Folder**: Think about what you're working on, not where files live
-2. **Use Sub-Groups**: Organize large groups with nested structure (v0.3.0)
-3. **Use Bookmarks for Logic Flow**: Mark key decision points in your code
-4. **Create AI Context Groups**: Group 5-10 files for focused AI assistance
-5. **Export Before Prompting**: Use "Copy Context for AI" before asking LLMs
-6. **Review and Refine**: Periodically clean up unused groups to stay organized
-
----
-
-## 🌍 Language Support
-
-VirtualTabs automatically switches based on your VS Code locale:
-
-- 🇺🇸 English (`en`)
-- 🇹🇼 Traditional Chinese (`zh-tw`)
-- 🇨🇳 Simplified Chinese (`zh-cn`)
-
-Change your VS Code locale to switch languages instantly.
+1. **Group by Task, Not Folder**: Think about the feature you're working on.
+2. **Use Bookmarks for Logic Flow**: Mark key decision points in your code.
+3. **Curate AI Context**: Group only necessary files (5-10) to maximize LLM accuracy and reduce token noise.
+4. **Share with Team**: Commit `.vscode/virtualTab.json` to share curated project views.
 
 ---
 
 ## ❓ FAQ
 
-### Q1: I don't see the VirtualTabs panel?
+**Q: I don't see the VirtualTabs panel?**
+Check if the extension is enabled and if you are using VS Code 1.75+. Look for the VirtualTabs icon in the Activity Bar.
 
-**Check:**
+**Q: How does "Copy Context for AI" work?**
+It reads all files in the group, formats them as markdown code blocks, and copies them to the clipboard.
 
-- The extension is enabled
-- Your VS Code version is 1.75+
-- VirtualTabs has its own icon in the Activity Bar (left sidebar)
-
-### Q2: How do I create sub-groups?
-
-Right-click any group → **Add Sub-Group**. You can also drag a group onto another group to nest it.
-
-### Q3: How does "Copy Context for AI" work?
-
-It reads all files in the group (including sub-groups), formats them as markdown code blocks, and copies to clipboard. Binary files are automatically skipped.
-
-### Q4: Can I share my groups with my team?
-
-Currently, groups are saved in `workspaceState` (local) or `.vscode/virtualTab.json` (shareable). v0.3.2 introduced support for `.vscode` storage!
-
-### Q5: Do bookmarks work across file renames?
-
-Yes! Bookmarks track file paths and will update if you rename files within VS Code.
-
-### Q6: How do I drag folders into groups?
-
-Simply drag a folder from the Explorer panel onto a group. VirtualTabs will automatically add all files recursively, skipping the directory entry itself.
-
----
-
-## 🔧 Developer Section
-
-Interested in contributing? Check out **[DEVELOPMENT.md](./DEVELOPMENT.md)** for:
-
-- Environment setup
-- Debugging & publishing guide
-- Module structure & data flow diagrams
-- Common error troubleshooting
+**Q: Can I reorder groups manually?**
+Yes, right-click any group and use the **Move Up/Down** commands.
 
 ---
 
 ## 🤝 Contributing
 
-We welcome community contributions:
+We welcome community contributions! Please check **[DEVELOPMENT.md](./DEVELOPMENT.md)** for environment setup and debugging guides.
 
-- 🐞 **Bug Reports** → [GitHub Issues](https://github.com/winterdrive/virtual-tabs/issues)
-- ✨ **Feature Requests** and UI suggestions
-- 🔧 **Code Contributions** (fork and submit a PR)
-- 🌍 **Translations** for new languages
+- 🐞 [Bug Reports/Feature Requests](https://github.com/winterdrive/virtual-tabs/issues)
 
 ---
 
-## 🤝 Recommended Companion
+## 🔥 Recommended Companion
 
 ### 🔥 Quick Prompt
 
 **The perfect partner for VirtualTabs.**
 
-While **VirtualTabs** organizes your **Context** (Files), **Quick Prompt** organizes your **Instructions** (Prompts).
+**VirtualTabs** keeps your workspace organized. **Quick Prompt** keeps your thoughts organized inside the IDE.
 
-- **VirtualTabs**: Defines *where* the AI should look (File Groups).
-- **Quick Prompt**: Defines *what* the AI should do (Prompt Management).
+- **VirtualTabs**: group files by task — across any directory, persisted across sessions
+- **Quick Prompt**: capture ideas and queue next tasks while your agent runs — without switching windows
 
-Together, they create the ultimate AI-coding workflow.
+Together, they reduce the cognitive overhead of AI-assisted development.
 
-[**Learn more about Quick Prompt**](https://github.com/winterdrive/QuickPrompt)
+Get Quick Prompt on [**VS Code Marketplace**](https://marketplace.visualstudio.com/items?itemName=winterdrive.quick-prompt) | [**Open VSX Registry**](https://open-vsx.org/extension/winterdrive/quick-prompt)
 
 ---
 
 ## 📅 Changelog
 
-### ✅ v0.3.3 (Latest)
-
-- ✅ Configurable confirmation dialogs for delete operations
-- ✅ Internationalized confirmation messages (EN/ZH-TW/ZH-CN)
-- ✅ Refactored confirmation logic into reusable utility
-
-### ✅ v0.3.2
-
-- ✅ Inline Run button for scripts (.bat/.exe)
-- ✅ Group Reordering (Move Up/Down)
-- ✅ Storage moved to `.vscode/virtualTab.json`
-- ✅ Expanded state persistence
-
-### ✅ v0.3.0
-
-- ✅ Sub-Groups & Nested Structure
-- ✅ AI Context Export ("Copy Context for AI")
-- ✅ Unified Copy Menu with smart behavior
-- ✅ Directory Drag & Drop (recursive file adding)
-- ✅ Copy/Paste/Delete operations
-- ✅ Multi-select delete for groups and files
-- ✅ Enhanced drag & drop with bookmark preservation
-
-### ✅ v0.2.0
-
-- ✅ Task-Oriented Bookmarks with smart flow
-- ✅ Enhanced tree view for bookmarks and files
-- ✅ Edit bookmark labels and descriptions
-
-### ✅ v0.1.0
-
-- ✅ File sorting (name, path, extension, modified time)
-- ✅ Auto-group by modification date
-- ✅ Per-group sort preferences
-- ✅ Full i18n support (EN, ZH-TW, ZH-CN)
+👉 See [CHANGELOG.md](./CHANGELOG.md) for full release history.
 
 ---
+
+## ❤️ Support
+
+If you find this extension helpful, please consider supporting the development!
+
+<a href="https://ko-fi.com/Q5Q41SR5WO"><img src="https://storage.ko-fi.com/cdn/kofi2.png?v=3" height="36" alt="ko-fi" /></a>
+
+**License**: [MIT](./LICENSE)
 
 **Organize smarter, code faster.** 🚀
-
----
-# DEVELOPMENT GUIDE
-[VirtualTabs Development Guide](https://raw.githubusercontent.com/winterdrive/VirtualTabs/main/DEVELOPMENT.md)
-
-# VirtualTabs Development Guide
-
-This document provides a complete guide for setting up the development environment and workflow for the VirtualTabs VS Code extension.
-
----
-
-## 🛠️ Environment Setup
-
-### System Requirements
-
-* **Node.js** (Recommended v16 or above)
-* **VS Code** (v1.75.0 or above)
-* **TypeScript** (included in devDependencies)
-
-### Setup Steps
-
-#### 1. Project Initialization
-
-```bash
-# Clone the project and enter the directory
-git clone https://github.com/winterdrive/virtual-tabs.git
-cd virtual-tabs
-
-# Install dependencies
-npm install
-```
-
-#### 2. Compile TypeScript
-
-```bash
-# One-time compilation
-npx tsc
-
-# Or use npm script
-npm run vscode:prepublish
-```
-
-#### 3. Start Development Mode
-
-There are two ways to start development mode:
-
-##### Method A: Use VS Code Debugging
-
-1. Open the project folder in VS Code
-2. Press `F5` or use the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
-3. Select "Debug: Start Debugging"
-4. A new Extension Development Host window will open
-
-##### Method B: Use Command Line
-
-```bash
-# macOS/Linux
-code --extensionDevelopmentPath=. --new-window
-
-# Windows
-code.cmd --extensionDevelopmentPath=. --new-window
-```
-
-#### 4. Live Development & Debugging
-
-##### Start TypeScript Watch Mode
-
-```bash
-# Start TypeScript watch mode for auto-compilation
-npx tsc --watch
-
-# Or use VS Code tasks
-# Press Cmd+Shift+P → "Tasks: Run Task" → "tsc: watch - tsconfig.json"
-```
-
-#### Reload the Extension
-
-In the Extension Development Host window:
-
-* Press `Cmd+R` (macOS) or `Ctrl+R` (Windows/Linux) to reload
-* Or use Command Palette → "Developer: Reload Window"
-
-#### 5. Debugging Tips
-
-### Set Breakpoints
-
-* Set breakpoints directly in TypeScript source code
-* Breakpoints will be active after starting debug mode with F5
-
-### View Debug Information
-
-* Use `console.log()` to output to the Developer Console
-* Check the Output panel → "Extension Host" channel
-* Use VS Code's Debug Console
-
-### Test Extension Features
-
-1. Open some files in the Extension Development Host window
-2. Check the "Virtual Tabs" view in the Explorer panel
-3. Test various features (grouping, drag-and-drop, context menu, etc.)
-
----
-
-## 🛠️ Technical Configuration Details
-
-### package.json Core Configuration
-
-```json
-{
-    "name": "virtual-tabs",
-    "displayName": "VirtualTabs",
-    "main": "./dist/extension.js",
-    "engines": { "vscode": "^1.75.0" },
-    "contributes": {
-        "views": {
-            "explorer": [{
-                "id": "virtualTabsView",
-                "name": "Virtual Tabs",
-                "icon": "$(tab)"
-            }]
-        },
-        "commands": [
-            // 40 registered commands, including group management, file operations, batch processing, etc.
-        ],
-        "menus": {
-            "view/item/context": [
-                // Rich context menu configuration, supports conditional display by contextValue
-            ]
-        }
-    }
-}
-```
-
-### TypeScript Compilation Configuration
-
-```json
-{
-    "compilerOptions": {
-        "target": "ES2020",
-        "module": "commonjs",
-        "outDir": "dist",
-        "rootDir": "src",
-        "strict": true,
-        "types": ["node", "vscode"]
-    }
-}
-```
-
-### VS Code Development Environment Configuration
-
-#### .vscode/launch.json
-
-```json
-{
-    "configurations": [{
-        "name": "Run Extension",
-        "type": "extensionHost",
-        "preLaunchTask": "vscode:prepublish",
-        "outFiles": ["${workspaceFolder}/dist/**/*.js"]
-    }]
-}
-```
-
-#### .vscode/tasks.json
-
-```json
-{
-    "tasks": [{
-        "label": "vscode:prepublish",
-        "command": "npm run vscode:prepublish",
-        "group": { "kind": "build", "isDefault": true },
-        "problemMatcher": ["$tsc"]
-    }]
-}
-```
-
----
-
-## 📁 Project Structure
-
-### Directory Overview
-
-```text
-virtual-tabs/
-├── .vscode/               # VS Code config files
-│   ├── launch.json       # Debug configuration (preLaunchTask: vscode:prepublish)
-│   └── tasks.json        # Build task configuration
-├── dist/                 # TypeScript build output
-├── assets/               # Icons and screenshots
-│   ├── hero_banner.png   # Hero banner for README
-│   ├── nested_groups_demo.png  # Sub-groups feature demo
-│   ├── ai_context_demo.png     # AI context export demo
-│   ├── copy_menu_demo.png      # Copy menu demo
-│   ├── drag_drop_demo.png      # Drag and drop demo
-│   ├── bookmarks_feature.png   # Bookmarks feature demo
-│   └── virtualtabs_icon_*.png  # Extension icons
-├── i18n/                 # Internationalization files
-│   ├── en.json          # English translations
-│   ├── zh-tw.json       # Traditional Chinese translations
-│   └── zh-cn.json       # Simplified Chinese translations
-├── src/                  # TypeScript source code
-│   ├── extension.ts      # Extension entry (activate/deactivate)
-│   ├── types.ts          # Data structure definitions (TempGroup, VTBookmark)
-│   ├── treeItems.ts      # TreeView item definitions (TempFolderItem/TempFileItem/BookmarkItem)
-│   ├── provider.ts       # TreeDataProvider implementation and group management logic
-│   ├── dragAndDrop.ts    # Drag-and-drop controller (supports files, groups, directories)
-│   ├── commands.ts       # VS Code command registration and implementation
-│   ├── bookmarks.ts      # Bookmark management and decoration utilities
-│   ├── grouping.ts       # File grouping logic (by date, etc.)
-│   ├── sorting.ts        # File sorting utilities
-│   ├── i18n.ts           # Internationalization utilities
-│   ├── util.ts           # Shared utility functions (confirmations, etc.)
-│   └── index.ts          # Module export entry
-├── package.json          # Extension description, commands, and menu configuration
-├── package.nls.json      # English localization for package.json
-├── package.nls.zh-tw.json # Traditional Chinese localization
-├── package.nls.zh-cn.json # Simplified Chinese localization
-├── tsconfig.json         # TypeScript config
-├── readme.md             # English README
-├── README.zh-TW.md       # Traditional Chinese README
-├── CHANGELOG.md          # Version change log
-├── DEVELOPMENT.md        # Detailed development guide
-├── I18N.md               # Internationalization guide
-├── LICENSE               # MIT License
-```
-
-### Module Responsibilities
-
-| Module File         | Description                                      | Main Class/Interface |
-| ------------------- | ------------------------------------------------ | -------------------- |
-| `extension.ts`      | Extension lifecycle management, initializes provider, drag-and-drop controller, and command registration | `activate()`, `deactivate()` |
-| `provider.ts`       | Implements `TreeDataProvider`, manages group data, file operations, sub-groups, and UI updates | `TempFoldersProvider` |
-| `treeItems.ts`      | Defines TreeView item classes, controls display behavior and contextValue | `TempFolderItem`, `TempFileItem`, `BookmarkItem` |
-| `types.ts`          | Defines shared data structures and interfaces    | `TempGroup`, `VTBookmark` |
-| `dragAndDrop.ts`    | Implements drag-and-drop controller, handles file/group/directory drag operations | `TempFoldersDragAndDropController` |
-| `commands.ts`       | Registers and implements all VS Code commands, including group, file, bookmark, and clipboard operations | `registerCommands()` |
-| `bookmarks.ts`      | Bookmark management and gutter decoration utilities (v0.2.0+) | `BookmarkManager` |
-| `grouping.ts`       | File grouping logic (by date, etc.)              | `FileGrouper`        |
-| `sorting.ts`        | File sorting utilities                           | `FileSorter`         |
-| `i18n.ts`           | Internationalization utilities                   | `I18n`               |
-| `util.ts`           | Shared utility functions (confirmations, etc.)   | `executeWithConfirmation` |
-
-### Core Data Flow
-
-```mermaid
-flowchart TD
-    A[Extension Startup] --> B[Initialize Provider]
-    B --> C[Load workspaceState]
-    C --> D[Create Built-in Group]
-    D --> E[Register TreeView]
-    E --> F[Register Drag-and-Drop Controller]
-    F --> G[Register Commands]
-    H[User Actions] --> I[Command Execution]
-    I --> J[Update Group Data]
-    J --> K[Save workspaceState]
-    K --> L[Trigger UI Refresh]
-```
-
----
-
-## 🔧 Common Development Issues
-
-### Q: Compile error "Cannot find module 'vscode'"
-
-```bash
-# Make sure the correct @types/vscode version is installed
-npm install --save-dev @types/vscode@^1.75.0
-```
-
-### Q: Extension does not appear in Extension Development Host
-
-* Check if the `main` field in `package.json` points to the correct build file
-* Ensure TypeScript compiles without errors
-* Check Developer Tools Console for errors
-
-### Q: Code changes are not reflected
-
-* Make sure TypeScript has recompiled (check the `dist/` folder)
-* Reload the window in Extension Development Host (`Cmd+R`)
-
-### Q: Drag-and-drop does not work
-
-* Ensure `dragAndDropController` is properly registered to TreeView
-* Check `supportedTypes` and `dropMimeTypes` configuration
-* Check Console for drag-and-drop related errors
-
-### Q: Commands do not appear in Command Palette
-
-* Check the `commands` configuration in `package.json`
-* Ensure commands are properly registered in `commands.ts`
-* Reload Extension Development Host
-
----
-
-## 🔁 Data Flow & Architecture
-
-### Module Interaction Diagram
-
-```mermaid
-flowchart TD
-    extension["extension.ts"] --> provider["provider.ts"]
-    extension --> dragAndDrop["dragAndDrop.ts"]
-    extension --> commands["commands.ts"]
-    provider --> treeItems["treeItems.ts"]
-    provider --> types["types.ts"]
-    provider --> grouping["grouping.ts"]
-    provider --> sorting["sorting.ts"]
-    dragAndDrop --> provider
-    dragAndDrop --> treeItems
-    commands --> provider
-    commands --> treeItems
-    commands --> util["util.ts"]
-    treeItems --> types
-```
-
-### Data Flow Overview
-
-1. `extension.ts` initializes `provider`, drag-and-drop controller, and commands on startup.
-2. `provider` loads open files and groups them by extension.
-3. User and UI interactions (click, drag, command) update data in `provider`.
-4. After group data updates, it is automatically saved to `workspaceState` and triggers UI refresh.
-
-### Auto-Sync of Open Files Group
-
-To ensure the "Currently Open Files" group in VirtualTabs always reflects the actual open editors in VS Code, the extension implements an automatic synchronization mechanism. This design guarantees that any file opened or closed in the editor is immediately reflected in the Virtual Tabs tree view, without requiring manual refresh.
-
-**Trigger Events:**
-
-| Scenario                        | Implementation (API)                        |
-|---------------------------------|---------------------------------------------|
-| Editor opens a new file         | `vscode.window.onDidChangeVisibleTextEditors` |
-| Editor closes a file            | `vscode.window.onDidChangeVisibleTextEditors` |
-| Virtual Tabs view becomes visible | `TreeView.onDidChangeVisibility`           |
-| Custom commands (e.g. group ops) | Direct call to `provider.refresh()`        |
-
-**Design Logic:**
-
-* On extension activation, a listener is registered for `onDidChangeVisibleTextEditors`.
-* Whenever the set of visible editors changes (open/close), the provider's `refresh()` method is called.
-* The `refresh()` method updates the built-in group by collecting all currently open file URIs and triggers a UI update.
-* This ensures the "Currently Open Files" group is always in sync with the editor state.
-
-**Key Implementation Points:**
-
-* No manual refresh is needed; the tree view updates automatically.
-* The mechanism is robust to all tab open/close actions, including group switching.
-* Custom commands that affect group content should also call `refresh()` to maintain consistency.
-
-**Relevant API Usage Example:**
-
-```typescript
-context.subscriptions.push(
-    vscode.window.onDidChangeVisibleTextEditors(() => {
-        provider.refresh();
-    })
-);
-```
-
-The `refresh()` method in the provider typically collects all open file URIs from the editor and updates the built-in group accordingly, then fires a tree data change event to update the UI.
-
-### Data Structure Concept Diagram
-
-```mermaid
-flowchart TD
-    %% Data Layer
-    TempGroup["TempGroup[] group data array"] --> Files["string[] file URI array"]
-    TempGroup --> GroupProperties["Group properties"]
-    GroupProperties --> BuiltIn["builtIn?: boolean (is built-in group)"]
-    GroupProperties --> Auto["auto?: boolean (is auto group)"]
-    GroupProperties --> Name["name: string (group name)"]
-
-    %% UI Layer Conversion
-    TempFoldersProvider["TempFoldersProvider data provider"] --> TempGroup
-    TempFoldersProvider --> TreeItems["TreeItem UI layer"]
-
-    %% TreeItem Types
-    TreeItems --> FolderItem["TempFolderItem group node"]
-    TreeItems --> FileItem["TempFileItem file node"]
-
-    %% File node properties
-    FileItem --> VSCodeUri["vscode.Uri file resource URI"]
-    FileItem --> GroupIndex["groupIdx: number (group index)"]
-
-    %% Operation Layer
-    DragAndDrop["TempFoldersDragAndDropController drag controller"] --> TempFoldersProvider
-    Commands["Command registration"] --> TempGroup
-    Commands --> GroupIndex
-```
-
-### Example Data Structure
-
-Data structure in memory and workspaceState:
-
-```json
-const groups: TempGroup[] = [
-    {
-        name: "Currently Open Files",  // Group name
-        files: [
-            "file:///c:/project/file1.ts",
-            "file:///c:/project/file2.json"
-        ],
-        builtIn: true  // This is a built-in group
-    },
-    {
-        name: "TypeScript Files",  // Auto-grouped
-        files: [
-            "file:///c:/project/file1.ts",
-            "file:///c:/project/file3.ts"
-        ],
-        auto: true  // This is an auto group
-    },
-    {
-        name: "My Custom Group",  // User custom group
-        files: [
-            "file:///c:/project/file1.ts",
-            "file:///c:/project/file2.json"
-        ]
-        // Not built-in or auto
-    }
-];
-```
-
-### UI Layer Conversion
-
-`TempGroup` data is converted to TreeView items for VS Code display:
-
-```typescript
-// Group node (corresponds to TempGroup)
-new TempFolderItem("TypeScript Files", 1, false)
-    ├── new TempFileItem(Uri.file("file1.ts"), 1, false)  // File node, records group index
-    └── new TempFileItem(Uri.file("file3.ts"), 1, false)  // File node, records group index
-```
-
-**Conversion Flow:**
-
-1. `TempGroup[]` data → `TempFoldersProvider.getChildren()`
-2. → `TempFolderItem` (group node) + `TempFileItem[]` (file nodes)
-3. → VS Code TreeView display
-
----
-
-## 🚀 Publishing & Deployment
-
-### Local Testing
-
-1. Ensure TypeScript compiles without errors
-2. Test all features in Extension Development Host
-3. Check version and dependencies in package.json
-
-### Package Extension
-
-```bash
-# Install vsce (Visual Studio Code Extension manager)
-npm install -g vsce
-
-# Package as .vsix file
-vsce package
-
-# Publish to VS Code Marketplace
-vsce publish
-```
-
-### Version Management
-
-```bash
-# Update version
-npm version patch  # Patch version (0.0.1 → 0.0.2)
-npm version minor  # Minor version (0.0.1 → 0.1.0)
-npm version major  # Major version (0.0.1 → 1.0.0)
-```
-
----
-
-## 🤝 Contribution Guide
-
-### Development Workflow
-
-1. Fork the project and create a feature branch
-2. Follow the existing code style and architecture
-3. Add appropriate comments and documentation
-4. Test new features or fixes
-5. Submit a Pull Request
-
-### Code Style
-
-* Use TypeScript strict mode
-* Follow existing naming conventions
-* Keep comments in Traditional Chinese (per user instruction)
-* Use JSDoc comments where appropriate
-
-### Testing Checklist
-
-* [ ] TypeScript compiles without errors
-* [ ] All features work in Extension Development Host
-* [ ] Drag-and-drop works
-* [ ] Context menu works
-* [ ] Multi-file selection works
-* [ ] Auto grouping works
-* [ ] Group management works
-
----
-
-## 📚 Resources
-
-* [VS Code Extension API](https://code.visualstudio.com/api)
-* [VS Code Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-* [TreeView API Documentation](https://code.visualstudio.com/api/extension-guides/tree-view)
-* [Drag and Drop API](https://code.visualstudio.com/api/references/vscode-api#TreeDragAndDropController)
-
----
-# INTERNATIONALIZATION GUIDE
-[VirtualTabs Internationalization Guide](https://raw.githubusercontent.com/winterdrive/VirtualTabs/main/I18N.md)
-
-# VirtualTabs Internationalization Guide
-
-VirtualTabs now supports a multilingual interface, offering Traditional Chinese, Simplified Chinese, and English options.
-
-## 🌍 Supported Languages
-
-| Language        | Code    | Status         |
-|----------------|---------|---------------|
-| English        | `en`    | ✅ Fully Supported |
-| Traditional Chinese | `zh-tw` | ✅ Fully Supported |
-| Simplified Chinese  | `zh-cn` | ✅ Fully Supported |
-
-## 🔧 How to Set Language
-
-### Method 1: VS Code Global Locale Setting
-
-1. Open VS Code settings (`Cmd+,` or `Ctrl+,`)
-2. Search for "locale"
-3. Find the "Locale" setting
-4. Choose your desired language:
-   - `en` - English
-   - `zh-tw` - Traditional Chinese
-   - `zh-cn` - Simplified Chinese
-5. Restart VS Code
-
-### Method 2: Via Command Palette
-
-1. Open the Command Palette (`Cmd+Shift+P` or `Ctrl+Shift+P`)
-2. Type "Configure Display Language"
-3. Select your desired language
-4. Restart VS Code
-
-### Method 3: Edit settings.json
-
-Add the following to your VS Code settings file:
-
-```json
-{
-    "locale": "zh-tw"  // or "en", "zh-cn"
-}
-```
-
-## 📋 Internationalized Content
-
-The following content in VirtualTabs is fully internationalized:
-
-### 📦 package.json Content
-
-- Extension display name
-- Extension description
-- All command titles
-- View container and view names
-
-### 💬 User Interface Messages
-
-- All system prompt messages
-- Error and warning messages
-- Progress messages
-- Input dialog prompts
-
-### 🏷️ Group Names
-
-- Built-in group names
-- Auto-group prefix
-- Default new group name
-- Copy group name suffix
-
-## 🛠️ Developer Guide
-
-### Add a New Language
-
-1. **Create language files:**
-
-   ```bash
-   # Create a new language file
-   cp i18n/en.json i18n/[language-code].json
-   cp package.nls.json package.nls.[language-code].json
-   ```
-
-2. **Translate content:**
-   Translate all strings in `i18n/[language-code].json` and `package.nls.[language-code].json`.
-
-3. **Test the language:**
-   Set the corresponding locale in VS Code and reload the extension.
-
-### Using i18n Strings in Code
-
-Use the `I18n.getMessage()` method in your code:
-
-```typescript
-import { I18n } from './i18n';
-
-// Basic usage
-const message = I18n.getMessage('message.pleaseSelectGroup');
-
-// With parameter formatting
-const formatted = I18n.getMessage('message.noFilesToOpen', groupName);
-
-// Convenience methods
-const groupName = I18n.getGroupName(undefined, 1); // "新群組 1"
-const builtInName = I18n.getBuiltInGroupName(); // "目前已開啟檔案"
-```
-
-### String Key Naming Convention
-
-- Use dot-separated namespaces: `category.subcategory.key`
-- Categories include:
-  - `group.*` - Group related
-  - `message.*` - User messages
-  - `input.*` - Input dialogs
-  - `progress.*` - Progress prompts
-  - `error.*` - Error messages
-
-## 🔍 Troubleshooting
-
-### Q: The extension does not display the correct language
-
-**Solution:**
-
-1. Make sure VS Code's locale setting is correct
-2. Reload the VS Code window
-3. Check if the corresponding language file exists
-
-### Q: Some text still appears in English
-
-**Possible reasons:**
-
-1. The string is not yet internationalized
-2. The language file is missing the translation
-3. The code uses hardcoded strings
-
-**Solution:**
-
-1. Check if `i18n/[language].json` contains the string
-2. Make sure the code uses `I18n.getMessage()` instead of hardcoded text
-
-### Q: How to revert to English interface
-
-Set VS Code locale to `en` and reload.
-
-## 📝 Contributing Translations
-
-We welcome community contributions for more languages:
-
-1. Fork the project
-2. Add a new language file (see developer guide above)
-3. Test the translation
-4. Submit a Pull Request
-
-We welcome translations for:
-
-- Japanese (`ja`)
-- Korean (`ko`)
-- German (`de`)
-- French (`fr`)
-- Spanish (`es`)
-- Other languages
-
----
-
-## 🎯 Language Reference Table
-
-### Main Feature Translation Table
-
-| Feature                | English                | Traditional Chinese | Simplified Chinese |
-|------------------------|------------------------|--------------------|-------------------|
-| Add Group              | Add Group              | 新增分群           | 新增分组          |
-| Add Sub-Group          | Add Sub-Group          | 新增子群組         | 新增子群组        |
-| Rename Group           | Rename Group           | 重命名群組         | 重命名群组        |
-| Duplicate Group        | Duplicate Group        | 複製群組           | 复制群组          |
-| Auto Group by Extension| Auto Group by Extension| 自動依副檔名分群   | 按扩展名自動分组  |
-| Currently Open Files   | Currently Open Files   | 目前已開啟檔案     | 当前已打开文件    |
-| New Group              | New Group              | 新群組             | 新群组            |
-| Copy                   | Copy                   | 複本               | 副本              |
-| Copy Context for AI    | Copy Context for AI    | 複製 AI 上下文     | 複製 AI 上下文    |
-| Copy File Paths        | Copy File Paths        | 複製檔案路徑清單   | 复制文件路径列表  |
-| Add Bookmark           | Add Bookmark to Group  | 加入書籤到群組     | 添加书签到群组    |
-| Edit Bookmark Label    | Edit Bookmark Label    | 編輯書籤標籤       | 编辑书签标签      |
-| Remove Bookmark        | Remove Bookmark        | 移除書籤           | 删除书签          |
-
-### Common Message Translation Table
-
-| Message Type           | English                | Traditional Chinese | Simplified Chinese |
-|-----------------------|------------------------|--------------------|-------------------|
-| Please select a group first | Please select a group first | 請先選取一個群組 | 请先选择一个群组 |
-| No files to group     | No files to group      | 沒有檔案可分群     | 沒有文件可分组    |
-| Name cannot be empty  | Name cannot be empty   | 名稱不可為空       | 名称不能为空      |
-| Name already exists   | Name already exists    | 名稱重複           | 名称重复          |
-| AI Context copied     | AI Context copied to clipboard! | AI 上下文已複製到剪貼簿！ | AI 上下文已複製到剪貼板！ |
-| Cannot nest into itself | Cannot nest a group into itself | 無法將群組巢狀到自身 | 无法将群组嵌套到自身 |
-
-For the full translation, see each language file:
-
-- [English (en.json)](./i18n/en.json)
-- [Traditional Chinese (zh-tw.json)](./i18n/zh-tw.json)
-- [Simplified Chinese (zh-cn.json)](./i18n/zh-cn.json)
-
----
-# CHANGELOG
-[VirtualTabs Changelog](https://raw.githubusercontent.com/winterdrive/VirtualTabs/main/CHANGELOG.md)
-
-# Change Log
-
-All notable changes to the "VirtualTabs" extension will be documented in this file.
-
-## [0.3.3] - 2025-12-31
-
-> **Special Thanks**: [@jianfulin](https://github.com/jianfulin) for the major contribution! 🎉
-
-### Added
-
-- **Configurable Confirmation Dialogs**: New setting `virtualTabs.confirmBeforeDelete` to control whether confirmation dialogs appear before deleting groups or files (default: enabled).
-- Confirmation messages now support internationalization (i18n) for English, Traditional Chinese, and Simplified Chinese.
-
-### Changed
-
-- Refactored confirmation logic into reusable `executeWithConfirmation` utility function in `util.ts`.
-- Improved user experience with modal confirmation dialogs for delete operations.
-
-## [0.3.2] - 2025-12-21
-
-> **Special Thanks**: [@jianfulin](https://github.com/jianfulin) for the major contribution! 🎉
-
-### Added
-
-- **Group Reordering**: Move groups up or down via context menu commands.
-- **Executable File Support**: `.bat` and `.exe` files now have an inline "Run" button. Clicking the file itself still opens it in editor for consistency.
-- **Expanded State Persistence**: Remember which groups are expanded/collapsed across VS Code restarts.
-- Persist group/bookmark data to `.vscode/virtualTab.json`.
-- Store file references in `virtualTab.json` as paths relative to the workspace root.
-
-### Changed
-
-- **Storage Location**: Moved `virtualTab.json` from workspace root to `.vscode/virtualTab.json` for cleaner project structure.
-- Allow duplicate group names when IDs differ.
-
-### Fixed
-
-- Improved shell command quoting for cross-platform terminal execution.
-
-## [0.3.0] - 2025-12-13
-
-### Added
-
-- **Sub-Groups & Nested Structure**: Create hierarchical group organization by adding sub-groups or dragging groups onto each other.
-- **AI Context Export**: Copy all files in a group as LLM-ready markdown with "Copy Context for AI" command.
-- **Unified Copy Menu**: New submenu with smart behavior - copies work differently on groups vs files.
-- **Directory Drag & Drop**: Drag folders from Explorer to recursively add all files within.
-- **Copy/Paste/Delete Commands**: Full clipboard operations for files and groups within VirtualTabs.
-- **Multi-select Delete**: Delete multiple groups or files at once.
-- **File Move with Bookmarks**: Dragging files between groups preserves their bookmarks.
-
-### Changed
-
-- Groups now require unique IDs for stable references (auto-migrated from older versions).
-- Improved drag-and-drop controller with better file/group/directory detection.
-- Context menus reorganized with separate submenus for different item types.
-- Copy File Name/Path commands now work on groups (copies all files recursively).
-
-### Fixed
-
-- Fixed circular nesting detection when dragging groups.
-- Fixed bookmark preservation when moving files between groups.
-- Improved error handling for large file context copying.
-
-## [0.2.0] - 2025-12-01
-
-### Added
-
-- **Task-Oriented Bookmarks**: You can now add bookmarks to specific lines of code within your VirtualTabs groups.
-- **Smart Flow**: Right-click to add bookmarks instantly without annoying input boxes. The system automatically labels them based on line content.
-- **Bookmark Navigation**: Click on a bookmark in the sidebar to jump directly to the code location.
-- **Bookmark Management**: Edit bookmark labels and descriptions, or remove them via the context menu.
-
-### Changed
-
-- Improved TreeView performance when handling groups with many files.
-- Updated `package.json` to include new bookmark commands and menus.
-- Refined UI for file items in the sidebar (click to open).
-
-### Fixed
-
-- Fixed an issue where file icons might not display correctly in some themes.
-
-## [0.1.0] - 2025-11-20
-
-### Added
-
-- Initial release of VirtualTabs.
-- Custom file grouping.
-- Built-in "Open Editors" group.
-- File sorting (Name, Path, Extension, Modified Time).
-- Auto-group by modification date.
-- Internationalization (i18n) support for English, Traditional Chinese, and Simplified Chinese.

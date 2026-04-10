@@ -180,12 +180,12 @@ VirtualTabs 透過 **Model Context Protocol (MCP)** 提供完整的 AI Agent 整
 
 **VirtualTabs 的完美夥伴。**
 
-**VirtualTabs** 組織您的**上下文**（檔案），**Quick Prompt** 組織您的**指示**（提示）。
+**VirtualTabs** 讓工作區保持整齊。**Quick Prompt** 讓你的思緒在 IDE 內保持整齊。
 
-- **VirtualTabs**：定義 AI 應該*看哪裡*（檔案群組）
-- **Quick Prompt**：定義 AI 應該*做什麼*（提示管理）
+- **VirtualTabs**：跨任何目錄，把檔案依任務分組——持久保存，跨 session 不消失
+- **Quick Prompt**：Agent 執行任務時，隨手記下下一步想法——無需切換視窗，不打斷思維流
 
-兩者結合，創造終極 AI 編程工作流程。
+兩者結合，大幅降低 AI 輔助開發的認知負荷。
 
 在 [**VS Code Marketplace**](https://marketplace.visualstudio.com/items?itemName=winterdrive.quick-prompt) | [**Open VSX Registry**](https://open-vsx.org/extension/winterdrive/quick-prompt) 取得 Quick Prompt
 

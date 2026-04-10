@@ -180,12 +180,12 @@ We welcome community contributions! Please check **[DEVELOPMENT.md](./DEVELOPMEN
 
 **The perfect partner for VirtualTabs.**
 
-While **VirtualTabs** organizes your **Context** (Files), **Quick Prompt** organizes your **Instructions** (Prompts).
+**VirtualTabs** keeps your workspace organized. **Quick Prompt** keeps your thoughts organized inside the IDE.
 
-- **VirtualTabs**: Defines *where* the AI should look (File Groups).
-- **Quick Prompt**: Defines *what* the AI should do (Prompt Management).
+- **VirtualTabs**: group files by task — across any directory, persisted across sessions
+- **Quick Prompt**: capture ideas and queue next tasks while your agent runs — without switching windows
 
-Together, they create the ultimate AI-coding workflow.
+Together, they reduce the cognitive overhead of AI-assisted development.
 
 Get Quick Prompt on [**VS Code Marketplace**](https://marketplace.visualstudio.com/items?itemName=winterdrive.quick-prompt) | [**Open VSX Registry**](https://open-vsx.org/extension/winterdrive/quick-prompt)
 
