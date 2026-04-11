@@ -52,3 +52,9 @@ docs/assets/virtualtabs_icon_32.png
 docs/assets/virtualtabs_icon_64.png
 docs/assets/virtualtabs_icon_256.png
 docs/assets/*1024X512.png
+
+.claude/
+.cursor/
+.github/
+.kiro/
+.agent/
