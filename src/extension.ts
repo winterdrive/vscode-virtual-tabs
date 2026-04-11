@@ -5,6 +5,7 @@ import { TempFoldersProvider } from './provider';
 import { TempFoldersDragAndDropController } from './dragAndDrop';
 import { registerCommands } from './commands';
 import { I18n } from './i18n';
+import { getWorkspaceRootUri } from './util';
 import { TempFolderItem, TempFileItem } from './treeItems';
 
 /**
@@ -184,8 +185,9 @@ export async function activate(context: vscode.ExtensionContext) {
     registerCommands(context, provider, () => lastSelectedCustomFile, stableMcpPath);
 
     // Watch for .vscode/virtualTab.json changes
-    const configPath = vscode.workspace.workspaceFolders?.[0]
-        ? new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], '.vscode/virtualTab.json')
+    const rootUri = getWorkspaceRootUri();
+    const configPath = rootUri
+        ? new vscode.RelativePattern(rootUri, '.vscode/virtualTab.json')
         : null;
 
     if (configPath) {

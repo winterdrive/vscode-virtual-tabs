@@ -2,6 +2,18 @@ import * as vscode from 'vscode';
 import { TempGroup } from './types';
 
 /**
+ * Returns the root URI of the current workspace.
+ * For multi-root workspaces, this is the directory containing the .code-workspace file.
+ * For single-folder workspaces, this is the first workspace folder's URI.
+ */
+export function getWorkspaceRootUri(): vscode.Uri | undefined {
+    if (vscode.workspace.workspaceFile) {
+        return vscode.Uri.joinPath(vscode.workspace.workspaceFile, '..');
+    }
+    return vscode.workspace.workspaceFolders?.[0]?.uri;
+}
+
+/**
  * Get all files from a group and all its nested child groups (recursive).
  * Uses a visited-Set to prevent infinite loops from circular parent references.
  * Returns a de-duplicated list of file URI strings.
