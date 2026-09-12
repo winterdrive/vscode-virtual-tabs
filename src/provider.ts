@@ -1060,12 +1060,30 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
         const parent = this.groups.find(g => g.id === parentGroupId);
         if (!group || !parent || group.builtIn || parent.builtIn) return false;
         if (group.id === parent.id) return false;
+        if (this.isDescendantGroup(parent.id, group.id)) return false;
 
         group.parentGroupId = parent.id;
         if (parent.sourceScopeId) {
             this.updateGroupScopeRecursive(group.id, parent.sourceScopeId);
         }
         return true;
+    }
+
+    /**
+     * Check if `groupId` is a descendant of `potentialAncestorId`, following
+     * parentGroupId links. Guards against cyclic chains with a visited set
+     * (mirrors dragAndDrop.ts's isDescendant).
+     */
+    private isDescendantGroup(groupId: string, potentialAncestorId: string, visited = new Set<string>()): boolean {
+        if (visited.has(groupId)) return false;
+        visited.add(groupId);
+
+        const group = this.groups.find(g => g.id === groupId);
+        if (!group || !group.parentGroupId) return false;
+
+        if (group.parentGroupId === potentialAncestorId) return true;
+
+        return this.isDescendantGroup(group.parentGroupId, potentialAncestorId, visited);
     }
 
     unnestGroup(groupId: string): boolean {
