@@ -1,5 +1,7 @@
 # 為什麼會有 VirtualTabs
 
+<!-- Translation of ../PHILOSOPHY.md. The English source is canonical; update it first, then sync this file. -->
+
 [繁體中文](./PHILOSOPHY.md) | [日本語](../ja/PHILOSOPHY.md) | [한국어](../ko/PHILOSOPHY.md) | [简体中文](../zh-CN/PHILOSOPHY.md) | [English](../PHILOSOPHY.md)
 
 AI Agent 接手的執行工作越多，人要扛的脈絡負擔就越重。這個論點在 [COSCUP 2026](https://coscup.org/2026/session/9CYHJT/) 講過：AI 跑得越快，我們反而越容易在螢幕前迷路？

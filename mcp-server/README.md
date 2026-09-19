@@ -58,7 +58,7 @@ graph LR
 
 ### Registered Primitives
 
-**Tools (17)**
+**Tools (19)**
 
 | Category | Tool Names |
 |:---|:---|
@@ -67,6 +67,7 @@ graph LR
 | Project Exploration | `explore_project` `read_file` |
 | Bookmark Management | `create_bookmark` `delete_bookmark` `list_bookmarks` |
 | Auto Grouping | `set_group_sorting` `auto_group_by_extension` `auto_group_by_date` |
+| Pattern Operations | `create_group_by_pattern` `remove_files_by_pattern` |
 | Safety Fallback | `validate_json_structure` `append_group_to_json` |
 
 **Resources (1)**
@@ -80,13 +81,14 @@ graph LR
 
 ## Features
 
-The MCP Server exposes 17 tools covering:
+The MCP Server exposes the tools listed in [Registered Primitives](#registered-primitives), covering:
 
 - **Group Management**: Create, rename, move, and delete groups
 - **File Management**: Add/remove files to/from groups
 - **Project Exploration**: Search project files, read file contents
 - **Bookmark Management**: Create, delete, and list bookmarks
 - **Auto Grouping**: Automatically create sub-groups by extension or modification date
+- **Pattern Operations**: Create groups or remove grouped files with server-side glob matching
 - **Safety Fallback Tools**: `validate_json_structure` (JSON schema validation), `append_group_to_json` (safe group append with auto-backup)
 
 ## Concurrency Safety 🔒
@@ -131,48 +133,12 @@ npm start -- --workspace-root /path/to/your/workspace
 npm run watch
 ```
 
-## Configuring MCP Clients
+## Client and Agent Setup
 
-💡 **Tip:** Use the VS Code command **VirtualTabs: Show MCP Config** to view detailed, per-client configuration instructions.
-
-Supported clients:
-
-- **Cursor** — AI-powered code editor
-- **GitHub Copilot** — VS Code AI assistant
-- **Kiro** — Professional AI IDE
-- **Claude Code** — Anthropic's desktop app
-- **Antigravity** — Google's AI IDE
-
-All clients require their MCP configuration file to point to the MCP Server entry point. Run the command above in VS Code for exact setup instructions.
-
-## Agent Skill Generation
-
-Beyond connecting an AI client to the MCP server, VirtualTabs can generate a **target-specific skill file** that teaches your AI tool exactly how to use VirtualTabs safely and effectively.
-
-Run the VS Code command **VirtualTabs: Generate Agent Skill** to produce the skill file for your AI tool:
-
-| AI Tool | Output File | Description |
-|:---|:---|:---|
-| Cursor | `.cursor/rules/virtualtabs.mdc` | Auto-loaded as an agent rule |
-| GitHub Copilot | `.github/skills/virtualtabs/SKILL.md` | Agent skill for Copilot |
-| Claude Code | `.claude/skills/virtualtabs/SKILL.md` | Skill for Claude Code |
-| Kiro IDE | `.kiro/skills/virtualtabs/SKILL.md` | Skill for Kiro |
-| Antigravity | `.agents/skills/virtualtabs/SKILL.md` | Skill for Antigravity |
-
-Each skill file includes:
-
-1. **CRITICAL CONCEPT block** — clarifies that VirtualTabs groups are *purely virtual* (no files are moved on disk). This prevents the most frequent agent misunderstanding.
-2. **Tool catalogue** — concise reference covering all 17 MCP tools.
-3. **Four-layer safety decision tree**:
-   - **Layer 1** — Use standard MCP tools (preferred path).
-   - **Layer 2** — Use safety tools (`validate_json_structure`, `append_group_to_json`).
-   - **Layer 3** — Fall back to the bundled `vt.bundle.js` CLI.
-   - **Layer 4** — Report failure to the user; do not edit JSON manually.
-
-   ![Safety Decision Tree](../docs/assets/safety_decision_tree_en.svg)
-4. **Bundled `vt.bundle.js`** — a self-contained CLI written alongside the skill file during generation. Supports `list-groups`, `add-group`, `add-files`, and `remove-group`.
-
-> **Implementation:** `src/mcp/SkillGenerator.ts` — see [DEVELOPMENT.md](../DEVELOPMENT.md#agent-skill-generation) for contributor guidelines.
+Use the [MCP Setup Guide](../docs/mcp-setup.md) for current client
+configuration and installation commands. Agent operating rules and fallback
+behavior are maintained only in the canonical
+[VirtualTabs Agent Skill](../skills/virtualtabs/SKILL.md).
 
 ---
 

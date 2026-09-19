@@ -87,7 +87,7 @@ In MVC/MVVM or large-scale projects, related files are often scattered across de
 - **AI Context Export** — One-click copy all files as LLM-ready context.
 - **Portable Config** — Settings saved to `.vscode/virtualTab.json` for team sharing.
 - **AI Agent Integration (MCP)** — Connect AI agents (Cursor, Claude, etc.) to manage groups programmatically.
-- **Agent Skill Installer** — Run **VirtualTabs: Install Agent Skill** to install the canonical `virtualtabs` skill. Use **Generate Skill Files Manually** only when you need agent-specific skill/rule files.
+- **Agent Skill Support** — Install the canonical `virtualtabs` skill using the current procedure in the [MCP Setup Guide](./docs/mcp-setup.md).
 - **Multi-Root Workspace Scopes** — Keep groups separated per workspace folder in multi-root projects.
 - **Auto Reveal & Sync** — Automatically focus active files and sync with native editor groups.
 - **Send to...** — Quickly send selected files or groups to pre-configured destinations.
@@ -144,21 +144,9 @@ In MVC/MVVM or large-scale projects, related files are often scattered across de
 
 VirtualTabs provides full AI agent integration via the **Model Context Protocol (MCP)**. Let your AI assistant (Cursor, Antigravity, Kiro, etc.) manage your workspace groups programmatically.
 
-- 🔌 **Standardized Tools**: Exposes 19 tools for creating groups and exploring the project.
-- 🛡️ **Safety Mode**: Features a four-layer safety decision tree to prevent unintended disk changes.
-  
-  ![Safety Decision Tree](docs/assets/safety_decision_tree_en.png)
-
-- ⚙️ **Easy Config**: Use the **MCP Config Panel** (command: `VirtualTabs: Show MCP Config`) to get ready-to-paste settings.
-- 🧠 **Agent Skills**: Run **VirtualTabs: Install Agent Skill** and choose **Auto Install (Recommended)** to install the canonical `virtualtabs` skill. You can also run the same install command directly:
-
-  ```bash
-  npx skills add winterdrive/vscode-virtual-tabs
-  ```
-
-  Choose **Generate Skill Files Manually** only when you need to write agent-specific skill/rule files yourself.
-
-👉 **See the [MCP Setup Guide](./docs/mcp-setup.md) for detailed IDE configuration.**
+- 🔌 **Standardized Tools**: Provides MCP tools for managing groups and exploring the project. See the [MCP server reference](./mcp-server/README.md) for the current capability catalog.
+- 🛡️ **Safety Mode**: Uses the canonical [VirtualTabs Agent Skill](./skills/virtualtabs/SKILL.md) to guide safe tool use and fallbacks.
+- ⚙️ **Setup**: Follow the [MCP Setup Guide](./docs/mcp-setup.md) for current client configuration and Agent Skill installation paths.
 
 ---
 
@@ -186,9 +174,9 @@ Yes, right-click any group and use the **Move Up/Down** commands.
 
 ## 🤝 Contributing
 
-We welcome community contributions! Please check **[DEVELOPMENT.md](./DEVELOPMENT.md)** for environment setup and debugging guides.
+We welcome community contributions! Start with **[CONTRIBUTING.md](./CONTRIBUTING.md)**, which links to the development and testing guides required for a pull request.
 
-- 🐞 [Bug Reports/Feature Requests](https://github.com/winterdrive/virtual-tabs/issues)
+- 🐞 [Bug Reports/Feature Requests](https://github.com/winterdrive/vscode-virtual-tabs/issues)
 
 ---
 

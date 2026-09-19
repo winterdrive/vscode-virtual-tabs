@@ -1,17 +1,32 @@
 # VirtualTabs
-> VirtualTabs is a VS Code extension with a bundled MCP Server for organizing files into persistent, cross-directory virtual groups and integrating with AI agents (Cursor, Copilot, Claude, Kiro, Antigravity).
 
-VirtualTabs helps developers manage complex workspaces by grouping related files regardless of location, including multi-root workspace projects with separate scope-level configs. It also provides Agent Skill installation for AI-driven workflows, with manual skill/rule file generation available when needed. A built-in MCP Server exposes 15+ tools for programmatic group management, ensuring that logical context is preserved even after closing the editor.
+> Canonical documentation index for VirtualTabs, a VS Code extension for
+> persistent virtual file groups, multi-root workspaces, and AI-agent
+> integration.
 
-## Documentation
-- [README](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/README.md): Core features, installation, and usage guide.
-- [Traditional Chinese README](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/README.zh-TW.md): Traditional Chinese usage guide.
-- [Simplified Chinese README](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/README.zh-CN.md): Simplified Chinese usage guide.
-- [Japanese README](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/README.ja.md): Japanese usage guide.
-- [Korean README](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/README.ko.md): Korean usage guide.
-- [Development Guide](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/DEVELOPMENT.md): Setup, architecture, and contribution instructions.
-- [Changelog](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/CHANGELOG.md): History of releases and updates.
-- [Full Context Documentation](https://winterdrive.github.io/vscode-virtual-tabs/llms-full.txt): A single file containing the full text of all critical documentation.
+This file is an index, not a copy of the source documentation. Follow the
+linked canonical document for current rules, commands, counts, and procedures.
 
-## Optional
-- [Internationalization](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/I18N.md): Details on language support and translations.
+## Canonical Documentation
+
+- [Product overview and usage](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/README.md)
+- [Development and extension architecture](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/DEVELOPMENT.md)
+- [Testing](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/docs/TESTING.md)
+- [Contributing](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/CONTRIBUTING.md)
+- [Release policy](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/docs/RELEASE_POLICY.md)
+- [MCP client setup](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/docs/mcp-setup.md)
+- [MCP server reference](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/mcp-server/README.md)
+- [Agent Skill behavior and safety](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/skills/virtualtabs/SKILL.md)
+- [Localization and translation policy](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/I18N.md)
+- [Product philosophy](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/docs/PHILOSOPHY.md)
+- [Release history](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/CHANGELOG.md)
+
+## Localized Mirrors
+
+Localized README and philosophy mirrors are available under
+[`docs/ja/`](https://github.com/winterdrive/vscode-virtual-tabs/tree/main/docs/ja),
+[`docs/ko/`](https://github.com/winterdrive/vscode-virtual-tabs/tree/main/docs/ko),
+[`docs/zh-CN/`](https://github.com/winterdrive/vscode-virtual-tabs/tree/main/docs/zh-CN),
+and
+[`docs/zh-TW/`](https://github.com/winterdrive/vscode-virtual-tabs/tree/main/docs/zh-TW).
+Their English sources remain canonical as defined in the localization policy.

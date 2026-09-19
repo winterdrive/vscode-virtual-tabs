@@ -1,5 +1,7 @@
 # VirtualTabs - VS Code の仮想タブ / カスタムファイルグループ拡張
 
+<!-- Translation of ../../README.md. The English source is canonical; update it first, then sync this file. -->
+
 [![Visual Studio Marketplace Version](https://vsmarketplacebadges.dev/version-short/winterdrive.virtual-tabs.svg)](https://marketplace.visualstudio.com/items?itemName=winterdrive.virtual-tabs)
 [![Open VSX Version](https://img.shields.io/open-vsx/v/winterdrive/virtual-tabs)](https://open-vsx.org/extension/winterdrive/virtual-tabs)
 [![Open VSX Downloads](https://img.shields.io/open-vsx/dt/winterdrive/virtual-tabs)](https://open-vsx.org/extension/winterdrive/virtual-tabs)
@@ -42,24 +44,16 @@
 - **AI Context Export**：グループ内のファイルを LLM が読みやすい Markdown としてコピーします。
 - **ポータブル設定**：グループ情報は `.vscode/virtualTab.json` に保存され、チームで共有できます。
 - **MCP 連携**：Model Context Protocol 経由で AI agent がグループを操作できます。
-- **Agent Skill Installer**：**VirtualTabs: Install Agent Skill** を実行して公式 `virtualtabs` skill をインストールします。特定 agent 向け skill/rule ファイルを手動で書き出す必要がある場合だけ、**Generate Skill Files Manually** を使います。
+- **Agent Skill 対応**：公式 `virtualtabs` skill の現在のインストール手順は [MCP Setup Guide](../mcp-setup.md) を参照してください。
 - **Multi-root scope**：multi-root workspace ではプロジェクトごとにグループを分離します。
 - **Send to...**：選択したファイルやグループを設定済みの送信先へ送れます。
 - **ファイル順序変更**：ドラッグ＆ドロップまたはショートカットで順序を調整できます。
 
 ## MCP と Agent Skills
 
-VirtualTabs には MCP server が組み込まれており、**VirtualTabs: Show MCP Config** パネルから AI クライアント向けの設定をコピーできます。接続後、Cursor、Claude、Copilot、Kiro、Antigravity などの agent は、グループの一覧取得、作成、ファイル追加、ブックマーク管理、AI context の出力を実行できます。
+VirtualTabs には MCP server が組み込まれており、AI agent がワークスペースのグループを管理できます。現在の機能一覧は [MCP server reference](../../mcp-server/README.md)、agent の安全な操作規則は [VirtualTabs Agent Skill](../../skills/virtualtabs/SKILL.md) を参照してください。
 
-**VirtualTabs: Install Agent Skill** を実行し、**Auto Install (Recommended)** を選んで公式 `virtualtabs` skill をインストールします。同じインストールコマンドを直接実行することもできます：
-
-```bash
-npx skills add winterdrive/vscode-virtual-tabs
-```
-
-特定 agent 向け skill/rule ファイルを手動で書き出す必要がある場合だけ、**Generate Skill Files Manually** を選びます。生成される内容には、VirtualTabs のグループが実ファイルシステム上のフォルダーではなく仮想グループであることも明示されます。
-
-詳しくは [MCP Setup Guide](../mcp-setup.md) を参照してください。
+クライアント設定と Agent Skill のインストール手順は [MCP Setup Guide](../mcp-setup.md) を参照してください。
 
 ## 推奨コンパニオン
 
@@ -69,8 +63,8 @@ npx skills add winterdrive/vscode-virtual-tabs
 
 ## Support
 
-- [Bug reports / feature requests](https://github.com/winterdrive/virtual-tabs/issues)
+- [Bug reports / feature requests](https://github.com/winterdrive/vscode-virtual-tabs/issues)
 - [Changelog](../../CHANGELOG.md)
-- [Development guide](../../DEVELOPMENT.md)
+- [Contributing guide](../../CONTRIBUTING.md)
 
 **License**: [MIT](../../LICENSE)

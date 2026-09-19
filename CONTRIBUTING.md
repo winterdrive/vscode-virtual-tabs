@@ -2,6 +2,14 @@
 
 Thank you for your interest in VirtualTabs (editorGrouper)! We welcome all forms of contribution, whether it's fixing bugs, developing new features, or improving documentation.
 
+## Repository Language
+
+Use English for tracked repository documentation, code comments, and public
+GitHub-facing content such as issues and pull requests, unless you are editing
+an explicitly localized file. Follow the canonical-source ownership map in
+[`AGENTS.md`](./AGENTS.md); do not copy mutable rules, counts, paths, or
+procedures into a second document.
+
 ## 🤖 AI-Assisted Development Guide for Contributors
 
 If you use AI tools (such as Cursor, Copilot, ChatGPT, or Claude) to assist with your development, we have prepared a specific prompt for you.
@@ -17,7 +25,7 @@ You are now a senior contributor to the VirtualTabs project. When I develop/modi
 
 1. **Development Rules**:
    - The project is a VS Code Extension based on TypeScript.
-   - Please use English for all internal code comments and documentation updates.
+   - Read `AGENTS.md` and the authoritative document it identifies for your task before making changes.
    - When adding new features, ensure they comply with the settings in `package.json` and the i18n specifications in `package.nls.json`.
    
 2. **Commit Message Format**:
@@ -47,13 +55,10 @@ You are now a senior contributor to the VirtualTabs project. When I develop/modi
 - Follow existing naming conventions.
 - Use JSDoc comments appropriately for main functions and classes.
 
-## ✅ Testing Checklist
+## ✅ Testing
 
-Before submitting a PR, please ensure your changes pass the following basic checks:
-
-- [ ] TypeScript compiles without errors (`npm run vscode:prepublish`)
-- [ ] All features work properly in the VS Code Extension Development Host
-- [ ] New features do not break existing Drag-and-drop, Context menu, and Multi-selection functionality
-- [ ] Auto-grouping and group management features work as expected
+Use [`docs/TESTING.md`](./docs/TESTING.md) as the canonical source for current
+automated suites, UI/E2E constraints, commands, and known limitations. Record
+the applicable automated and manual validation in the pull-request template.
 
 If you have any questions about the architecture or design, feel free to open an Issue to discuss!

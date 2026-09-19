@@ -1,6 +1,7 @@
 ## 🙏 Thank you for your contribution
 
-Before submitting this PR, please ensure you have read the [CONTRIBUTING.md](../CONTRIBUTING.md) and completed the checklist below.
+Before submitting this PR, read [CONTRIBUTING.md](../CONTRIBUTING.md) and use
+the current [Testing Guide](../docs/TESTING.md) for applicable validation.
 
 ### 📌 What problem does this PR solve?
 >
@@ -16,10 +17,9 @@ Before submitting this PR, please ensure you have read the [CONTRIBUTING.md](../
 
 Please check the items you have verified locally:
 
-- [ ] Code compiles properly without errors (`npm run vscode:prepublish`)
-- [ ] Fully tested and working in the Extension Development Host
-- [ ] Original functionality (e.g., grouping, drag-and-drop, context menus) is not broken by this PR
-- [ ] If new text is added, relevant `i18n` language files have been updated
+- [ ] I completed the applicable validation from the [Testing Guide](../docs/TESTING.md) and listed the results in this PR.
+- [ ] I recorded risk-appropriate manual validation, or explained why it is not applicable.
+- [ ] If localized content changed, I followed the translation workflow in [I18N.md](../I18N.md).
 
 ### 📸 Screenshots or Screen Recordings (Optional)
 >
