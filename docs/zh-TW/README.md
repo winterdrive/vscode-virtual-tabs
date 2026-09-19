@@ -1,5 +1,7 @@
 # VirtualTabs – VS Code 虛擬分頁與自定義檔案分組擴充套件
 
+<!-- Translation of ../../README.md. The English source is canonical; update it first, then sync this file. -->
+
 [![Visual Studio Marketplace Version](https://vsmarketplacebadges.dev/version-short/winterdrive.virtual-tabs.svg)](https://marketplace.visualstudio.com/items?itemName=winterdrive.virtual-tabs)
 [![Open VSX Version](https://img.shields.io/open-vsx/v/winterdrive/virtual-tabs)](https://open-vsx.org/extension/winterdrive/virtual-tabs)
 [![Open VSX Downloads](https://img.shields.io/open-vsx/dt/winterdrive/virtual-tabs)](https://open-vsx.org/extension/winterdrive/virtual-tabs)
@@ -87,7 +89,7 @@
 - **AI 上下文匯出** — 一鍵複製所有檔案為 LLM 就緒的 Markdown 格式。
 - **便攜設定** — 設定儲存於 `.vscode/virtualTab.json`，方便團隊共享。
 - **AI Agent 整合 (MCP)** — 讓 AI 代理（Cursor、Claude 等）程序化管理您的群組。
-- **Agent Skill 安裝器** — 執行 **VirtualTabs: Install Agent Skill** 安裝正式 `virtualtabs` skill。只有需要自行寫入指定 agent 的 skill/rule 檔案時，才使用 **Generate Skill Files Manually**。
+- **Agent Skill 支援** — 正式 `virtualtabs` skill 的目前安裝步驟請參閱 [MCP 設定指南](../mcp-setup.zh-TW.md)。
 - **Multi-root 工作區範圍** — 在 multi-root 專案中依每個工作區資料夾分開保存群組。
 - **自動追蹤與同步** — 自動定位作用中檔案，並與原生編緝器分組同步。
 - **傳送至...** — 快速將選取的檔案或整個群組傳送到指定目的地。
@@ -144,21 +146,9 @@
 
 VirtualTabs 透過 **Model Context Protocol (MCP)** 提供完整的 AI Agent 整合。讓您的 AI 助手（Cursor, Antigravity, Kiro 等）能夠透過程式化管理您的工作區。
 
-- 🔌 **標準化工具**：提供 19 個工具供 AI 建立群組及探索專案。
-- 🛡️ **安全性**：具備四層安全決策樹，確保 AI 不會非預期地變動物理檔案。
-
-  ![安全決策樹](../assets/safety_decision_tree_zh.png)
-
-- ⚙️ **輕鬆配置**：使用 **MCP 設定面板** (命令：`VirtualTabs: Show MCP Config`) 獲取現成配置。
-- 🧠 **Agent Skills**：執行 **VirtualTabs: Install Agent Skill**，選擇 **Auto Install (Recommended)** 安裝正式 `virtualtabs` skill。你也可以直接執行同一條安裝命令：
-
-  ```bash
-  npx skills add winterdrive/vscode-virtual-tabs
-  ```
-
-  只有需要自行寫入指定 agent 的 skill/rule 檔案時，才選 **Generate Skill Files Manually**。
-
-👉 **詳細配置請參閱 [MCP 設定指南](../mcp-setup.zh-TW.md)。**
+- 🔌 **標準化工具**：提供 MCP 工具管理群組與探索專案；目前能力目錄請參考 [MCP server reference](../../mcp-server/README.md)。
+- 🛡️ **安全性**：以 canonical [VirtualTabs Agent Skill](../../skills/virtualtabs/SKILL.md) 規範安全的工具使用及 fallback 流程。
+- ⚙️ **設定**：目前的 client configuration 與 Agent Skill 安裝步驟請參閱 [MCP 設定指南](../mcp-setup.zh-TW.md)。
 
 ---
 
@@ -186,9 +176,9 @@ VirtualTabs 透過 **Model Context Protocol (MCP)** 提供完整的 AI Agent 整
 
 ## 🤝 參與貢獻
 
-我們熱烈歡迎社群貢獻！請查看 **[DEVELOPMENT.md](../../DEVELOPMENT.md)** 了解開發環境設定與除錯指南。
+我們熱烈歡迎社群貢獻！請從 **[CONTRIBUTING.md](../../CONTRIBUTING.md)** 開始，並依其中連結閱讀開發與測試指南。
 
-- 🐞 [Bug 回報/功能建議](https://github.com/winterdrive/virtual-tabs/issues)
+- 🐞 [Bug 回報/功能建議](https://github.com/winterdrive/vscode-virtual-tabs/issues)
 
 ---
 
