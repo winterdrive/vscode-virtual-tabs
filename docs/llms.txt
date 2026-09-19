@@ -1,32 +1,26 @@
 # VirtualTabs
 
-> Canonical documentation index for VirtualTabs, a VS Code extension for
-> persistent virtual file groups, multi-root workspaces, and AI-agent
-> integration.
+> VirtualTabs is a VS Code extension for persistent virtual file groups,
+> multi-root workspaces, and AI-agent integration.
 
-This file is an index, not a copy of the source documentation. Follow the
-linked canonical document for current rules, commands, counts, and procedures.
+Use the links below as the canonical sources for current rules, commands,
+counts, paths, and procedures.
 
-## Canonical Documentation
+## Documentation
 
-- [Product overview and usage](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/README.md)
-- [Development and extension architecture](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/DEVELOPMENT.md)
-- [Testing](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/docs/TESTING.md)
-- [Contributing](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/CONTRIBUTING.md)
-- [Release policy](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/docs/RELEASE_POLICY.md)
-- [MCP client setup](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/docs/mcp-setup.md)
-- [MCP server reference](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/mcp-server/README.md)
-- [Agent Skill behavior and safety](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/skills/virtualtabs/SKILL.md)
-- [Localization and translation policy](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/I18N.md)
-- [Product philosophy](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/docs/PHILOSOPHY.md)
-- [Release history](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/CHANGELOG.md)
+- [Full context](https://winterdrive.github.io/vscode-virtual-tabs/llms-full.txt): Generated aggregate of the canonical documentation listed below.
+- [Product overview and usage](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/README.md): Installation, features, user workflows, and project links.
+- [Product philosophy](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/PHILOSOPHY.md): The product problem and design motivation.
+- [MCP client setup](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/mcp-setup.md): Current AI-client and Agent Skill setup.
+- [MCP server reference](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/mcp-server/README.md): Architecture, primitives, capabilities, build, and startup.
+- [Agent Skill](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/skills/virtualtabs/SKILL.md): Canonical agent behavior and fallback safety workflow.
+- [Development guide](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/DEVELOPMENT.md): Local development and extension architecture.
+- [Testing guide](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/TESTING.md): Current suites, commands, UI/E2E constraints, and limitations.
+- [Contributing guide](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/CONTRIBUTING.md): Repository language, contribution, and pull-request expectations.
+- [Localization guide](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/I18N.md): Localization and documentation translation policy.
+- [Release policy](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/RELEASE_POLICY.md): Release channels, trains, gates, authorization, and contributor fast lane.
 
-## Localized Mirrors
+## Optional
 
-Localized README and philosophy mirrors are available under
-[`docs/ja/`](https://github.com/winterdrive/vscode-virtual-tabs/tree/main/docs/ja),
-[`docs/ko/`](https://github.com/winterdrive/vscode-virtual-tabs/tree/main/docs/ko),
-[`docs/zh-CN/`](https://github.com/winterdrive/vscode-virtual-tabs/tree/main/docs/zh-CN),
-and
-[`docs/zh-TW/`](https://github.com/winterdrive/vscode-virtual-tabs/tree/main/docs/zh-TW).
-Their English sources remain canonical as defined in the localization policy.
+- [Release history](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/CHANGELOG.md): Version-by-version shipped changes.
+- [Localized documentation](https://github.com/winterdrive/vscode-virtual-tabs/tree/main/docs): Translated mirrors whose English sources remain canonical.

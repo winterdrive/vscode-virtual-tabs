@@ -29,6 +29,7 @@ in the same change.
 | Agent Skill behavior and safety workflow | `skills/virtualtabs/SKILL.md` |
 | Localization and documentation translation policy | `I18N.md` and the existing locale files |
 | Product philosophy | `docs/PHILOSOPHY.md` |
+| LLM discovery index and generated full context | `docs/llms.txt` and `scripts/generate-llms-full.mjs` |
 | Shipped behavior and release history | `CHANGELOG.md` |
 
 For any release-related task, read `docs/RELEASE_POLICY.md` in full before
