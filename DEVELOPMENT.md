@@ -776,33 +776,13 @@ new TempFolderItem("TypeScript Files", 1, false)
 
 ## 🚀 Publishing & Deployment
 
-### Versioning Convention (Pre-release vs Stable)
+Release channels, release-train rules, validation gates, and authorization
+boundaries are defined only in
+[`docs/RELEASE_POLICY.md`](./docs/RELEASE_POLICY.md). Read it in full before
+planning or performing any release operation.
 
-VirtualTabs follows the VS Code Marketplace pre-release convention based on the **minor version number**:
-
-| Minor version | Parity | Published as |
-|:---|:---|:---|
-| 0.8.x, 0.10.x, 1.0.x, … | **Even** | Stable release (default channel) |
-| 0.7.x, 0.9.x, 1.1.x, … | **Odd** | Pre-release (opt-in channel) |
-
-**How CI handles this automatically:**
-
-The `publish.yml` workflow reads the minor version from `package.json` at merge time:
-- Odd minor → publishes with `vsce publish --pre-release`
-- Even minor → publishes normally (stable)
-
-You never need to pass `--pre-release` manually.
-
-Release governance, including the External Contributor Fast Lane and release
-authorization boundaries, is defined in [`docs/RELEASE_POLICY.md`](./docs/RELEASE_POLICY.md).
-
-**Release flow:**
-1. For a routine train, batch approved PRs → squash-merge into main/master. A merged external-contributor bug fix follows the Fast Lane and must not wait for unrelated routine PRs.
-2. Create release branch: `git checkout -b release/vX.Y.Z-YYMMDD`
-3. Bump version in `package.json` (odd = pre-release, even = stable)
-4. Update `CHANGELOG.md`
-5. Open release PR → squash-merge
-6. CI auto-publishes to VS Code Marketplace + Open VSX
+The implementation of automatic Marketplace and Open VSX publication lives in
+[`.github/workflows/publish.yml`](./.github/workflows/publish.yml).
 
 ### Local Testing
 
@@ -819,17 +799,6 @@ npm install -g vsce
 # Package as .vsix file
 vsce package
 
-# Publish to VS Code Marketplace
-vsce publish
-```
-
-### Version Management
-
-```bash
-# Update version
-npm version patch  # Patch version (0.0.1 → 0.0.2)
-npm version minor  # Minor version (0.0.1 → 0.1.0)
-npm version major  # Major version (0.0.1 → 1.0.0)
 ```
 
 ---
