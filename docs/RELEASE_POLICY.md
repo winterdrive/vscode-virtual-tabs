@@ -1,95 +1,115 @@
 # VirtualTabs Release Policy
 
-本文件是 VirtualTabs 發版治理的單一事實來源（SSOT）。規劃或執行任何發版前，
-維護者與 AI agent 都必須先確認最新的 `main`、遠端 PR、CI、Marketplace 與
-Open VSX 狀態，不得只依賴舊對話、舊報告或本地 branch 推斷目前版本狀態。
+This document is the single source of truth (SSOT) for VirtualTabs release
+governance. Before planning or executing a release, maintainers and AI agents
+must verify the current `main`, remote pull requests, CI, Marketplace, and Open
+VSX state. Do not infer current release state from an old conversation, report,
+or local branch.
 
 ## Version Channels
 
-VirtualTabs 以 minor version 的奇偶數決定發佈通道：
+VirtualTabs uses minor-version parity to select the publication channel:
 
-- 偶數 minor（例如 `0.14.x`、`0.16.x`）為 stable release。
-- 奇數 minor（例如 `0.13.x`、`0.15.x`）為 pre-release。
-- stable line 發現緊急問題時，以 patch release（例如 `0.14.1`）修正。
-- 下一輪尚在驗證中的變更進入下一個奇數 minor pre-release，成熟後再升下一個
-  偶數 minor stable。
+- Even minor versions, such as `0.14.x` and `0.16.x`, are stable releases.
+- Odd minor versions, such as `0.13.x` and `0.15.x`, are pre-releases.
+- An urgent fix on a stable line uses a patch release, such as `0.14.1`.
+- The next unproven batch enters the next odd-minor pre-release and is promoted
+  to the next even-minor stable release after validation.
 
-實際發佈旗標由 `.github/workflows/publish.yml` 根據 `package.json` 自動判定，
-不得手動繞過這項版本規則。
+`.github/workflows/publish.yml` determines the publication flags from
+`package.json`. Do not manually override the channel selected by this version
+convention.
 
 ## External Contributor Fast Lane
 
-外部貢獻者提交並已合併的 bug fix，會立即開啟 stable release window。
-此處的外部貢獻者，是指 PR 並非由 repository owner、例行維護 automation 或 bot
-所提交。
+A merged bug fix authored by an external contributor immediately opens a
+stable release window. An external contributor is a pull-request author who is
+not the repository owner, routine maintenance automation, or a bot.
 
-1. 修正可以先經過 pre-release 驗證，但不得長期只停留在 pre-release channel。
-2. 若目前 pre-release line 已完成發版驗證，直接升下一個 stable minor。
-3. 若目前 pre-release line 尚未成熟，將最小修正 backport 到目前 stable patch line。
-4. 不得為了湊 release batch，等待無關的 maintainer-authored routine PR。
-5. stable release 的 `CHANGELOG.md` 必須列出 PR number 並明確 credit 貢獻者。
-6. Fast Lane 不會取消測試、人工 UI/E2E 或 owner approval；它縮短的是排隊時間，
-   不是品質門檻。
+1. The fix may pass through pre-release validation, but it must not remain
+   available only in the pre-release channel indefinitely.
+2. If the current pre-release line has completed release validation, promote it
+   directly to the next stable minor release.
+3. If the current pre-release line is not ready, backport the minimal fix to the
+   current stable patch line.
+4. Do not delay the release merely to batch unrelated maintainer-authored
+   routine pull requests.
+5. The stable `CHANGELOG.md` entry must reference the pull request and clearly
+   credit its contributor.
+6. The Fast Lane shortens queueing time, not quality gates. Automated tests,
+   owner-operated UI/E2E validation, and release authorization still apply.
 
-### Stable promotion 或 backport
+### Stable promotion or backport
 
-依以下順序決定：
+Decide in this order:
 
-1. 確認目前 stable 與 pre-release 版本，以及外部 PR 的實際相依基底。
-2. 若 pre-release 已通過 automated release checks、沒有已知 release blocker，且
-   owner 完成發版前人工 UI/E2E，則升下一個 stable minor。
-3. 否則，驗證該修正能否以最小差異套用至目前 stable line；可以時發 stable
-   patch release。
-4. 若 promotion 與 backport 都受阻，必須向 owner 報告具體技術 blocker 與最短
-   解法，不得只把修正留在 pre-release 而不建立後續行動。
+1. Verify the current stable and pre-release versions and the external pull
+   request's actual dependency base.
+2. Promote the pre-release to the next stable minor if automated release checks
+   pass, no known release blocker remains, and the owner completes the required
+   pre-release UI/E2E validation.
+3. Otherwise, verify whether the minimal fix applies safely to the current
+   stable line and publish a stable patch release when it does.
+4. If both promotion and backport are blocked, report the concrete technical
+   blocker and the shortest resolution path to the owner. Do not leave the fix
+   in pre-release without a follow-up action.
 
 ## Release Train
 
-一般變更依以下流程前進：
+Normal changes follow this flow:
 
-1. Candidate PR 各自完成 code review、typecheck、unit/property tests、coverage 與
-   VSIX packaging。
-2. Candidate PR 不為了搭車自行修改 version；版本與 release CHANGELOG 集中在
-   release PR。
-3. Release PR 建立後即視為封車。除 release blocker 外，不再臨時加入其他 PR。
-4. Release PR body 應列出 Included、Deferred、automated validation、manual
-   validation 與 known issues。
-5. 外部貢獻者 Fast Lane 的發車時間，不得被未完成的內部候選 PR 延後。
+1. Each candidate pull request completes code review, type checking,
+   unit/property tests, coverage, and VSIX packaging.
+2. Candidate pull requests do not bump the release version merely to enter a
+   train. Version and release changelog updates belong in the release pull
+   request.
+3. The train is frozen when the release pull request is created. Do not add
+   another pull request unless it fixes a release blocker.
+4. The release pull-request body lists Included and Deferred changes,
+   automated validation, manual validation, and known issues.
+5. Unfinished internal candidates must not delay an external contributor's
+   Fast Lane release window.
 
-涉及 persistence、migration、multi-root scope routing、group identity 或其他核心
-狀態模型的變更，應使用獨立的 pre-release train；不得為了湊版號與低風險修補
-混在同一班 stable hotfix。
+Persistence, migration, multi-root scope routing, group identity, and other
+core state-model changes use a dedicated pre-release train. Do not mix them
+into a stable hotfix merely to fill a release batch.
 
 ## Release Gates
 
-### Candidate PR gate
+### Candidate pull-request gate
 
-- PR 已更新到足以代表最新 `main` 的基底，且沒有未處理的 merge conflict。
-- TypeScript、unit/property tests、coverage 與 VSIX packaging 通過。
-- persistence、provider 或 multi-root 變更必須測試 production code path，不得只在
-  test file 重新實作一份相同演算法。
-- `git diff --check` 乾淨。
+- The branch represents a sufficiently current `main` and has no unresolved
+  merge conflict.
+- TypeScript, unit/property tests, coverage, and VSIX packaging pass.
+- Persistence, provider, and multi-root changes test the production code path;
+  a test-only reimplementation of the algorithm is not sufficient.
+- `git diff --check` is clean.
 
-### Release PR gate
+### Release pull-request gate
 
-- `package.json` 與 `package-lock.json` 版本一致。
-- `CHANGELOG.md` 列出所有 Included PR；外部貢獻者修正包含 contributor credit。
-- `release-ready` label 啟用後，version validation 與其他 required CI 全部通過。
-- owner 在本機完成與本次風險相稱的 UI/E2E 與 packaged VSIX smoke test。
+- `package.json` and `package-lock.json` contain the same version.
+- `CHANGELOG.md` lists every Included pull request and credits external
+  contributors.
+- After applying `release-ready`, version validation and all other required CI
+  checks pass.
+- The owner completes risk-appropriate local UI/E2E validation and a packaged
+  VSIX smoke test.
 
-真正的 VS Code UI/E2E 是發版前人工 gate，不是每支 PR 的 required remote gate。
-`.github/workflows/ui-tests.yml` 僅供經 owner 逐次明確同意後的診斷用途；AI agent
-不得自行觸發，也不得把 shared runner 的環境失敗直接判定為產品 regression。
+Real VS Code UI/E2E validation is a manual pre-release gate, not a required
+remote gate for every pull request. `.github/workflows/ui-tests.yml` is only a
+diagnostic workflow and requires explicit owner authorization for each run. An
+AI agent must not trigger it independently or treat a shared-runner environment
+failure as proof of a product regression.
 
 ## CHANGELOG Contributor Credit
 
-外部貢獻者的 stable release entry 至少應包含：
+An external contributor's stable release entry must include:
 
-- 修正的使用者可見行為。
-- PR number。
-- GitHub contributor handle。
+- The user-visible behavior that was fixed.
+- The pull-request number.
+- The contributor's GitHub handle.
 
-範例：
+Example:
 
 ```md
 - **fix(provider):** prevent persisted built-in groups from duplicating on reload
@@ -99,6 +119,8 @@ VirtualTabs 以 minor version 的奇偶數決定發佈通道：
 
 ## Authorization Boundary
 
-分析、規劃與本機驗證不等於發版授權。建立或更新遠端 PR、加上
-`release-ready`、merge release PR、觸發 remote UI workflow、tag 或 publish，皆需
-owner 對該次操作的明確授權；先前一次授權不得自動沿用。
+Analysis, planning, and local validation do not authorize a release. Creating
+or modifying a remote release pull request, applying `release-ready`, merging a
+release pull request, triggering the remote UI workflow, tagging, or publishing
+requires explicit owner authorization for that specific operation. Approval
+for an earlier operation does not carry forward automatically.

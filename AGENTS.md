@@ -1,19 +1,37 @@
 # Repository Agent Instructions
 
-- 任務報告與規劃文件優先使用繁體中文；保留英文 identifiers、paths 與 commands。
-- 回答或修改前，先搜尋 repository 內相近議題、實作與既有決策，不得只依賴對話文字。
+- Use English for repository-facing documentation, code comments, issues, and pull requests unless editing an explicitly localized file.
+- Before answering or changing the repository, inspect related implementation, documentation, open work, and prior decisions. Do not rely on conversation context alone.
+- Keep changes narrow and preserve unrelated worktree changes.
+
+## Authoritative Documentation Map
+
+Use this file as a routing entry point. Do not copy detailed procedures into
+`AGENTS.md`; read the authoritative source required for the current task.
+
+| Task | Required source |
+|---|---|
+| Release planning, version channels, contributor fast lane, release authorization | `docs/RELEASE_POLICY.md` |
+| Build, local development, architecture, packaging | `DEVELOPMENT.md` |
+| Current automated and UI/E2E test procedures | `docs/TESTING.md` |
+| Contribution and pull-request expectations | `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` |
+| Localization changes | `I18N.md` and the existing locale files |
+| Shipped behavior and release history | `CHANGELOG.md` |
+
+Files under `docs/specs/`, `docs/research/`, and
+`docs/specs/historical_release/` may describe proposals or historical states.
+Do not treat them as current operational policy unless an authoritative source
+explicitly points to them.
 
 ## Release Governance
 
-規劃或執行任何 release 前，必須完整閱讀 `docs/RELEASE_POLICY.md`，並重新確認
-最新的 `main`、遠端 PR、CI、Marketplace 與 Open VSX 狀態。
+Before planning or executing a release, read `docs/RELEASE_POLICY.md` in full
+and re-check the current `main`, remote pull requests, CI, Marketplace, and
+Open VSX state.
 
-- 已合併的 external-contributor bug fix 立即進入 Contributor Fast Lane。
-- 此類修正不得長期只停留在 pre-release，也不得為了等待無關的內部 routine PR
-  而延後 stable release。
-- 若目前 pre-release 已完成發版驗證，升下一個 stable minor；否則將最小修正
-  backport 至目前 stable patch line。
-- stable `CHANGELOG.md` 必須列出 PR number 並 credit contributor。
-- 真正的 UI/E2E 是 owner 在發版前執行的人工 gate，不是一般 PR required gate。
-- 未取得 owner 對該次操作的明確授權前，不得建立或修改遠端 release PR、加上
-  `release-ready`、merge、觸發 remote UI workflow、tag 或 publish。
+- A merged external-contributor bug fix immediately enters the Contributor Fast Lane.
+- It must not remain pre-release-only indefinitely or wait for unrelated maintainer-authored routine pull requests before reaching stable.
+- If the current pre-release has completed release validation, promote it to the next stable minor. Otherwise, backport the minimal fix to the current stable patch line.
+- The stable `CHANGELOG.md` entry must reference the pull request and credit the contributor.
+- Real UI/E2E validation is an owner-operated pre-release gate, not a required gate for every pull request.
+- Without explicit owner authorization for that specific operation, do not create or modify a remote release pull request, apply `release-ready`, merge, trigger the remote UI workflow, tag, or publish.
