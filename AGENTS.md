@@ -1,6 +1,6 @@
 # Repository Agent Instructions
 
-- Use English for repository-facing documentation, code comments, issues, and pull requests unless editing an explicitly localized file.
+- Use English for tracked repository documentation and code comments unless editing an explicitly localized file.
 - Before answering or changing the repository, inspect related implementation, documentation, open work, and prior decisions. Do not rely on conversation context alone.
 - Keep changes narrow and preserve unrelated worktree changes.
 
