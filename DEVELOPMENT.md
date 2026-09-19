@@ -793,8 +793,11 @@ The `publish.yml` workflow reads the minor version from `package.json` at merge 
 
 You never need to pass `--pre-release` manually.
 
+Release governance, including the External Contributor Fast Lane and release
+authorization boundaries, is defined in [`docs/RELEASE_POLICY.md`](./docs/RELEASE_POLICY.md).
+
 **Release flow:**
-1. Batch routine PRs → squash-merge into main/master
+1. For a routine train, batch approved PRs → squash-merge into main/master. A merged external-contributor bug fix follows the Fast Lane and must not wait for unrelated routine PRs.
 2. Create release branch: `git checkout -b release/vX.Y.Z-YYMMDD`
 3. Bump version in `package.json` (odd = pre-release, even = stable)
 4. Update `CHANGELOG.md`

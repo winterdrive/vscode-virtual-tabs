@@ -6,6 +6,10 @@ name: Publish Extension
 #
 # CI reads the minor version from package.json at merge time and sets the flag automatically.
 # You never need to pass --pre-release manually.
+#
+# Release governance SSOT: docs/RELEASE_POLICY.md
+# Merged external-contributor bug fixes must not remain pre-release-only or
+# wait for unrelated maintainer-authored routine PRs before entering stable.
 
 on:
   workflow_dispatch:
