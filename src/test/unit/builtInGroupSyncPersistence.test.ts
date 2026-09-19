@@ -51,7 +51,8 @@ jest.mock('vscode', () => {
         window: {
             tabGroups: { all: [] },
             showErrorMessage: jest.fn(),
-            showInformationMessage: jest.fn()
+            showInformationMessage: jest.fn(),
+            setStatusBarMessage: jest.fn()
         },
         workspace: { workspaceFolders: [] }
     };
@@ -306,6 +307,51 @@ describe('TempFoldersProvider built-in group persistence', () => {
             expect(internals.saveGroupsImmediate).toHaveBeenCalledWith(undefined);
         } finally {
             jest.useRealTimers();
+        }
+    });
+
+    test('loadGroups filters out a stray persisted builtIn entry instead of duplicating the built-in group', () => {
+        // Regression test: built-in groups are excluded from persistence by
+        // saveGroupsImmediate's isBuiltInFamily() guard, but if a builtIn: true
+        // entry ever ends up on disk anyway (e.g. from an older buggy save, or
+        // a manually edited config), loadGroups() must not treat it as a
+        // second real group. Without the fix, every full reload
+        // (onExternalFileChange with no scopeId, which reinitializeScopes()/
+        // the refresh command triggers) would carry the existing in-memory
+        // built-in group forward AND load the stray one from disk, doubling
+        // the "Currently Open Files" group each time.
+        const root = fs.mkdtempSync(path.join(os.tmpdir(), 'virtualtabs-stray-builtin-'));
+        try {
+            fs.mkdirSync(path.join(root, '.vscode'), { recursive: true });
+            const configPath = path.join(root, '.vscode', 'virtualTab.json');
+            fs.writeFileSync(configPath, JSON.stringify([
+                { id: 'builtin_group_id', name: 'Currently Open Files', files: ['stale.ts'], builtIn: true },
+                { id: 'custom-group', name: 'Custom', files: [] }
+            ], null, 2));
+
+            const manager = new GroupManager(root);
+            const { provider, internals } = createProviderHarness([{
+                id: 'builtin_group_id',
+                name: 'Currently Open Files',
+                files: [],
+                builtIn: true
+            }]);
+            provider.configScopes = [
+                { id: 'scope-a', type: 'folder', label: 'A', uri: { fsPath: root } } as never
+            ];
+            internals.groupManagers = new Map([['scope-a', manager]]);
+
+            provider.onExternalFileChange();
+
+            const builtInGroups = provider.groups.filter(g => g.builtIn);
+            expect(builtInGroups).toHaveLength(1);
+            expect(provider.groups.filter(g => g.name === 'Custom')).toHaveLength(1);
+
+            // A second reload must not compound the duplication further.
+            provider.onExternalFileChange();
+            expect(provider.groups.filter(g => g.builtIn)).toHaveLength(1);
+        } finally {
+            fs.rmSync(root, { recursive: true, force: true });
         }
     });
 
