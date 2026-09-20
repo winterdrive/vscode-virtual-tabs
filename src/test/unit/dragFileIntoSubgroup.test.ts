@@ -18,18 +18,49 @@
  * fsPath-based "add to target" check succeeds — leaving the file in both
  * groups under two different string encodings of the same path.
  *
- * This uses the `vscode-uri` package (the same URI implementation
- * vscode.Uri is built on) as the mocked vscode.Uri, so Uri.parse(...).
- * toString() reproduces the real encoding behavior instead of a
- * hand-rolled approximation — and exercises the real dragAndDrop.ts /
- * treeItems.ts / provider.ts production code path, not a reimplementation.
+ * The mocked vscode.Uri below reproduces vscode.Uri's real default
+ * toString() encoding (percent-encoding everything except path separators,
+ * which is what turns a drive-letter colon into %3A) so the test exercises
+ * the actual mismatch, not a hand-rolled shortcut that bypasses it — while
+ * still exercising the real dragAndDrop.ts / treeItems.ts / provider.ts
+ * production code path, not a reimplementation of their logic.
  */
 
 import * as path from 'path';
-import { URI } from 'vscode-uri';
 import type { TempGroup, ConfigScope } from '../../types';
 
 jest.mock('vscode', () => {
+    /**
+     * Minimal stand-in for vscode.Uri, scoped to what this test needs:
+     * parse() decodes a file:// string into an fsPath, and toString()
+     * re-encodes it the way vscode.Uri's default (non-skipEncoding)
+     * toString() does — percent-encoding each path segment, which notably
+     * encodes a Windows drive-letter colon (":") to "%3A".
+     */
+    class Uri {
+        private constructor(public readonly fsPath: string) { }
+
+        static parse(value: string): Uri {
+            const raw = value.replace(/^file:\/\/\//, '');
+            const decoded = decodeURIComponent(raw);
+            return new Uri(process.platform === 'win32' ? decoded.replace(/\//g, '\\') : decoded);
+        }
+
+        static file(fsPath: string): Uri {
+            return new Uri(path.resolve(fsPath));
+        }
+
+        static joinPath(base: Uri, ...segments: string[]): Uri {
+            return new Uri(path.join(base.fsPath, ...segments));
+        }
+
+        toString(): string {
+            const normalized = this.fsPath.replace(/\\/g, '/');
+            const encoded = normalized.split('/').map(seg => encodeURIComponent(seg)).join('/');
+            return `file:///${encoded}`;
+        }
+    }
+
     class TreeItem {
         id?: string;
         resourceUri?: unknown;
@@ -45,7 +76,7 @@ jest.mock('vscode', () => {
     }
 
     return {
-        Uri: URI,
+        Uri,
         TreeItem,
         TreeItemCollapsibleState: {
             None: 0,
@@ -77,6 +108,7 @@ jest.mock('vscode', () => {
     };
 }, { virtual: true });
 
+import * as vscode from 'vscode';
 import { TempFoldersProvider } from '../../provider';
 import { TempFolderItem, TempFileItem } from '../../treeItems';
 import { TempFoldersDragAndDropController } from '../../dragAndDrop';
@@ -106,7 +138,7 @@ class FakeDataTransfer {
 
 /** Renders a TempFileItem the way provider.ts's getChildren() actually does. */
 function renderFileItem(uriStr: string, groupIdx: number, groupId: string): TempFileItem {
-    const uri = URI.parse(uriStr) as unknown as never;
+    const uri = vscode.Uri.parse(uriStr);
     return new TempFileItem(uri, groupIdx, false, groupId);
 }
 
