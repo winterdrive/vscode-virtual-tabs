@@ -2123,6 +2123,12 @@ Source: [Release history](https://raw.githubusercontent.com/winterdrive/vscode-v
 
 All notable changes to the "VirtualTabs" extension will be documented in this file.
 
+## [0.14.0] - Stable Release: Multi-Root State Consistency & Reload Safety - 2026-09-20
+
+- **Stable Promotion:** promotes the tested `0.13.0` multi-root and state-consistency batch to the stable channel, including #120, #121, #122, #123, #126, #127, #128, #140, and #141.
+- **fix(provider):** ignore stray persisted `builtIn` entries when loading one scope or all scopes, preventing repeated refreshes or external configuration reloads from duplicating the built-in `Currently Open Files` group ([#149](https://github.com/winterdrive/vscode-virtual-tabs/pull/149), thanks [@jianfulin](https://github.com/jianfulin)).
+- **docs(release):** establish canonical release governance, the External Contributor Fast Lane, documentation ownership, and generated LLM context artifacts (#150).
+
 ## [0.13.0] - Multi-Root & State-Consistency Batch (pre-release) - 2026-08-27
 
 - **fix(commands):** duplicate the built-in `Currently Open Files` group into an explicit target scope, show it immediately, and persist only that scope; multi-root workspaces use `Workspace Config`, while single-folder windows use their folder scope (#140, fixes #138).

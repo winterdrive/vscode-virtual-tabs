@@ -34,7 +34,7 @@ import {
     ViewControl,
     VSBrowser
 } from 'vscode-extension-tester';
-import { By, Key } from 'selenium-webdriver';
+import { By, Key, WebElement } from 'selenium-webdriver';
 import { expect } from 'chai';
 
 // ─── Fixture paths ─────────────────────────────────────────────────────────────
@@ -199,25 +199,31 @@ async function findTreeItem(section: CustomTreeSection, label: string, timeoutMs
  * Returns a deduplicated, non-empty-string array.  Callers should guard that
  * the array is non-empty before using it for negative assertions.
  */
-async function getContextMenuItemsFor(rowLabel: string | RegExp, timeoutMs = 12_000, preClick = false): Promise<string[]> {
+async function getContextMenuItemsFor(rowLabelOrElement: string | RegExp | WebElement, timeoutMs = 12_000, preClick = false): Promise<string[]> {
     const driver = VSBrowser.instance.driver;
 
     // Dismiss first so the row is found fresh (no stale references from a prior menu).
     await dismissContextViews();
 
-    const row = await driver.wait(async () => {
-        const rows = await driver.findElements(By.css('.monaco-list-row'));
-        for (const r of rows) {
-            try {
-                const text = (await r.getText()).trim();
-                const matches = typeof rowLabel === 'string'
-                    ? text.includes(rowLabel)
-                    : rowLabel.test(text);
-                if (matches) { return r; }
-            } catch { /* stale ref — retry */ }
-        }
-        return null;
-    }, timeoutMs, `Tree row matching "${rowLabel}" not found for context menu`) as Awaited<ReturnType<typeof driver.findElement>>;
+    // A caller may pass an already-resolved WebElement (e.g. from
+    // TreeItem.findChildItem()) to target a specific row unambiguously,
+    // instead of a global basename search that can match an unrelated row
+    // with the same displayed text (see the "File (Custom Group)" suite).
+    const row = rowLabelOrElement instanceof WebElement
+        ? rowLabelOrElement
+        : await driver.wait(async () => {
+            const rows = await driver.findElements(By.css('.monaco-list-row'));
+            for (const r of rows) {
+                try {
+                    const text = (await r.getText()).trim();
+                    const matches = typeof rowLabelOrElement === 'string'
+                        ? text.includes(rowLabelOrElement)
+                        : rowLabelOrElement.test(text);
+                    if (matches) { return r; }
+                } catch { /* stale ref — retry */ }
+            }
+            return null;
+        }, timeoutMs, `Tree row matching "${rowLabelOrElement}" not found for context menu`) as Awaited<ReturnType<typeof driver.findElement>>;
 
     // Re-establish tree selection so hasFileSelected context key is true when the
     // context menu opens (ESC in dismissContextViews may have cleared selection).
@@ -263,22 +269,24 @@ async function getContextMenuItemsFor(rowLabel: string | RegExp, timeoutMs = 12_
  * all environments).  Callers should assert length > 0 before using for negative
  * tests.
  */
-async function getInlineActionLabelsFor(rowLabel: string | RegExp, timeoutMs = 12_000): Promise<string[]> {
+async function getInlineActionLabelsFor(rowLabelOrElement: string | RegExp | WebElement, timeoutMs = 12_000): Promise<string[]> {
     const driver = VSBrowser.instance.driver;
 
-    const row = await driver.wait(async () => {
-        const rows = await driver.findElements(By.css('.monaco-list-row'));
-        for (const r of rows) {
-            try {
-                const text = (await r.getText()).trim();
-                const matches = typeof rowLabel === 'string'
-                    ? text.includes(rowLabel)
-                    : rowLabel.test(text);
-                if (matches) { return r; }
-            } catch { /* stale */ }
-        }
-        return null;
-    }, timeoutMs, `Tree row matching "${rowLabel}" not found for inline actions`) as Awaited<ReturnType<typeof driver.findElement>>;
+    const row = rowLabelOrElement instanceof WebElement
+        ? rowLabelOrElement
+        : await driver.wait(async () => {
+            const rows = await driver.findElements(By.css('.monaco-list-row'));
+            for (const r of rows) {
+                try {
+                    const text = (await r.getText()).trim();
+                    const matches = typeof rowLabelOrElement === 'string'
+                        ? text.includes(rowLabelOrElement)
+                        : rowLabelOrElement.test(text);
+                    if (matches) { return r; }
+                } catch { /* stale */ }
+            }
+            return null;
+        }, timeoutMs, `Tree row matching "${rowLabelOrElement}" not found for inline actions`) as Awaited<ReturnType<typeof driver.findElement>>;
 
     await driver.actions().move({ origin: row }).perform();
     await driver.sleep(400);
@@ -589,28 +597,30 @@ describe('Menu Availability Matrix – File (Custom Group) (virtualTabsFileCusto
         await groupItem.expand();
         await waitForTreeLabel(FILE_BASENAME);
 
-        // Left-click the file row to set the virtualTabs:hasFileSelected context key.
+        const driver = VSBrowser.instance.driver;
+
+        // Resolve the file row scoped to this specific custom group rather than
+        // a global basename search. Left-clicking a file row opens it in the
+        // editor (TempFileItem's command), which makes VS Code's built-in
+        // "Currently Open Files" group surface its own row with the same
+        // basename above this group — a plain-text search across all rows
+        // would grab that built-in row instead and every assertion below
+        // would be checking the wrong item's menu.
+        const fileItem = await driver.wait(async () => {
+            try { return (await groupItem.findChildItem(FILE_BASENAME)) ?? false; }
+            catch { return false; }
+        }, 10_000, `Could not find file "${FILE_BASENAME}" inside group "${GROUP_NAME}"`) as TreeItem;
+
+        // Left-click to set the virtualTabs:hasFileSelected context key.
         // Right-clicking does NOT change the selection in VS Code's tree view, so the
         // key remains set when getContextMenuItemsFor right-clicks the same row.
-        const driver = VSBrowser.instance.driver;
-        await driver.wait(async () => {
-            const rows = await driver.findElements(By.css('.monaco-list-row'));
-            for (const r of rows) {
-                try {
-                    if ((await r.getText()).includes(FILE_BASENAME)) {
-                        await r.click();
-                        return true;
-                    }
-                } catch { /* stale */ }
-            }
-            return false;
-        }, 10_000, `Could not left-click file row "${FILE_BASENAME}" to set hasFileSelected`);
+        await fileItem.click();
 
         // Wait for the extension to propagate the context key
         await driver.sleep(500);
 
-        ctxItems = await getContextMenuItemsFor(FILE_BASENAME, 12_000, true);
-        inlineLabels = await getInlineActionLabelsFor(FILE_BASENAME);
+        ctxItems = await getContextMenuItemsFor(fileItem, 12_000, true);
+        inlineLabels = await getInlineActionLabelsFor(fileItem);
 
         expect(ctxItems.length, `Context menu returned no items for "${FILE_BASENAME}". Items: [${ctxItems.join(', ')}]`).to.be.greaterThan(0);
         // "Delete File" is always present for custom files regardless of selection state;
