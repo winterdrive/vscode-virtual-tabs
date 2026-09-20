@@ -128,11 +128,15 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
                         const uri = this.toDroppedUri(uriStr);
                         const stat = await vscode.workspace.fs.stat(uri);
 
-                        if (stat.type === vscode.FileType.Directory) {
+                        // vscode.FileType is a bitmask (e.g. a symlinked directory reports
+                        // Directory | SymbolicLink), so strict equality would silently skip
+                        // symlinks. Use bitwise checks, testing Directory first since a path
+                        // can't be both.
+                        if ((stat.type & vscode.FileType.Directory) !== 0) {
                             // It's a directory - recursively get all files
                             const filesInDir = await this.getFilesInDirectoryRecursive(uri);
                             allFileUris.push(...filesInDir.map(f => f.toString()));
-                        } else if (stat.type === vscode.FileType.File) {
+                        } else if ((stat.type & vscode.FileType.File) !== 0) {
                             // It's a file - add directly
                             allFileUris.push(uri.toString());
                         }
@@ -427,11 +431,24 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
         return files;
     }
 
+    // A symlinked directory that (directly or indirectly) contains itself would
+    // otherwise recurse forever, since each recursive call joins a new, ever-growing
+    // path segment onto the URI rather than repeating a previously seen one.
+    private static readonly MAX_RECURSIVE_DROP_DEPTH = 50;
+
     /**
      * Recursively get all files in a directory
      */
-    private async getFilesInDirectoryRecursive(dirUri: vscode.Uri): Promise<vscode.Uri[]> {
+    private async getFilesInDirectoryRecursive(
+        dirUri: vscode.Uri,
+        depth: number = 0
+    ): Promise<vscode.Uri[]> {
         const files: vscode.Uri[] = [];
+
+        if (depth >= TempFoldersDragAndDropController.MAX_RECURSIVE_DROP_DEPTH) {
+            console.error(`Directory nesting too deep (possible symlink cycle), stopping at: ${dirUri.fsPath}`);
+            return files;
+        }
 
         try {
             const entries = await vscode.workspace.fs.readDirectory(dirUri);
@@ -439,9 +456,10 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
             for (const [name, type] of entries) {
                 const entryUri = vscode.Uri.joinPath(dirUri, name);
 
-                if (type === vscode.FileType.File) {
-                    files.push(entryUri);
-                } else if (type === vscode.FileType.Directory) {
+                // vscode.FileType is a bitmask (e.g. a symlinked directory reports
+                // Directory | SymbolicLink), so strict equality would silently skip
+                // symlinked entries. Use bitwise checks instead.
+                if ((type & vscode.FileType.Directory) !== 0) {
                     // Skip hidden directories (names starting with '.') such as .git, .github
                     // to match VS Code's native tree view behavior.
                     // Hidden files (e.g. .gitignore, .editorconfig) are still included.
@@ -449,8 +467,10 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
                         continue;
                     }
                     // Recursively get files from subdirectory
-                    const subFiles = await this.getFilesInDirectoryRecursive(entryUri);
+                    const subFiles = await this.getFilesInDirectoryRecursive(entryUri, depth + 1);
                     files.push(...subFiles);
+                } else if ((type & vscode.FileType.File) !== 0) {
+                    files.push(entryUri);
                 }
             }
         } catch (e) {
