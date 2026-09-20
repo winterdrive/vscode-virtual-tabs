@@ -1,5 +1,7 @@
 # VirtualTabs가 존재하는 이유
 
+<!-- Translation of ../PHILOSOPHY.md. The English source is canonical; update it first, then sync this file. -->
+
 [繁體中文](../zh-TW/PHILOSOPHY.md) | [日本語](../ja/PHILOSOPHY.md) | [한국어](./PHILOSOPHY.md) | [简体中文](../zh-CN/PHILOSOPHY.md) | [English](../PHILOSOPHY.md)
 
 AI 에이전트가 실행을 더 많이 떠맡을수록, 인간이 짊어지는 컨텍스트도 늘어납니다. 이 생각은 [COSCUP 2026](https://coscup.org/2026/session/9CYHJT/)에서 발표되었습니다: *AI Runs Faster, So Why Are Developers Getting More Lost?*

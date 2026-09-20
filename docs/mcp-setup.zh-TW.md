@@ -1,10 +1,12 @@
 # AI Agent 的 MCP 設定指南
 
+<!-- Translation of ./mcp-setup.md. The English source is canonical; update it first, then sync this file. -->
+
 本指南提供如何在各種 AI 驅動的 IDE 及代理（Agent）中配置 VirtualTabs MCP 伺服器的詳細說明。
 
 ## 🔌 核心概念
 
-VirtualTabs 內建了一個完整打包的 MCP 伺服器 (`dist/mcp/index.js`)，它為 AI 代理（如 Cursor, Copilot, Claude, Kiro, Antigravity）提供超過 15 種工具，讓 AI 能夠以程序化方式管理您的工作區群組。
+VirtualTabs 內建完整打包的 MCP 伺服器 (`dist/mcp/index.js`)，讓 AI 代理（如 Cursor、Copilot、Claude、Kiro、Antigravity）能以程序化方式管理工作區群組。目前的 primitive 與工具目錄以 [MCP server reference](../mcp-server/README.md#registered-primitives) 為準。
 
 > [!IMPORTANT]
 > **VirtualTabs 的群組純屬「虛擬結構」。** AI 工具 *不會* 透過這些工具移動、修改您在磁碟上的物理檔案。它們僅管理 VirtualTabs UI 內的邏輯組織。
@@ -49,7 +51,7 @@ VirtualTabs 可為您的代理生成自定義的「技能檔案」：
 
 執行命令：`VirtualTabs: Install Agent Skill`。選擇 **Auto Install (Recommended)** 走標準安裝流程；只有需要指定 agent 檔案時，才選 **Generate Skill Files Manually**。
 
-生成的技能文件包含一個**四層安全決策樹**，確保 AI 能正確且安全地使用這些工具。
+安裝或生成的 skill 應遵循 [`skills/virtualtabs/SKILL.md`](../skills/virtualtabs/SKILL.md) 所定義的 canonical 行為與安全流程。
 
 ![安全決策樹](./assets/safety_decision_tree_zh.png)
 
