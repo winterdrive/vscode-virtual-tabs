@@ -27,23 +27,34 @@
  */
 
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 import type { TempGroup, ConfigScope } from '../../types';
 
 jest.mock('vscode', () => {
     /**
-     * Minimal stand-in for vscode.Uri, scoped to what this test needs:
-     * parse() decodes a file:// string into an fsPath, and toString()
-     * re-encodes it the way vscode.Uri's default (non-skipEncoding)
-     * toString() does — percent-encoding each path segment, which notably
-     * encodes a Windows drive-letter colon (":") to "%3A".
+     * Minimal stand-in for vscode.Uri, scoped to what this test needs.
+     *
+     * parse()/.fsPath delegate to Node's real fileURLToPath() -- the exact
+     * function src/core/FileEntryMatcher.ts uses to interpret a stored
+     * file:// entry -- so this mock's notion of "which file this points to"
+     * always agrees with the production matcher, on any platform (a
+     * hand-rolled string-splitting parser previously disagreed with
+     * fileURLToPath() specifically on Linux CI, since POSIX keeps a
+     * leading "/" before a Windows-shaped "c:/..." path that a naive
+     * `.replace(/^file:\/\/\//, '')` silently drops).
+     *
+     * toString() re-encodes the fsPath the way vscode.Uri's default
+     * (non-skipEncoding) toString() does -- percent-encoding each path
+     * segment, which notably encodes a Windows drive-letter colon (":")
+     * to "%3A". This is the one place this mock deliberately diverges
+     * from a "real" Uri implementation, because it's the exact encoding
+     * mismatch this test exists to reproduce.
      */
     class Uri {
         private constructor(public readonly fsPath: string) { }
 
         static parse(value: string): Uri {
-            const raw = value.replace(/^file:\/\/\//, '');
-            const decoded = decodeURIComponent(raw);
-            return new Uri(process.platform === 'win32' ? decoded.replace(/\//g, '\\') : decoded);
+            return new Uri(fileURLToPath(value));
         }
 
         static file(fsPath: string): Uri {
@@ -57,7 +68,7 @@ jest.mock('vscode', () => {
         toString(): string {
             const normalized = this.fsPath.replace(/\\/g, '/');
             const encoded = normalized.split('/').map(seg => encodeURIComponent(seg)).join('/');
-            return `file:///${encoded}`;
+            return `file://${encoded.startsWith('/') ? '' : '/'}${encoded}`;
         }
     }
 
