@@ -1,5 +1,7 @@
 # VirtualTabs が存在する理由
 
+<!-- Translation of ../PHILOSOPHY.md. The English source is canonical; update it first, then sync this file. -->
+
 [繁體中文](../zh-TW/PHILOSOPHY.md) | [日本語](./PHILOSOPHY.md) | [한국어](../ko/PHILOSOPHY.md) | [简体中文](../zh-CN/PHILOSOPHY.md) | [English](../PHILOSOPHY.md)
 
 AI エージェントが実行を引き受けるほど、人が抱えるコンテキストは増えていきます。この考えは [COSCUP 2026](https://coscup.org/2026/session/9CYHJT/) で発表されました：*AI Runs Faster, So Why Are Developers Getting More Lost?*

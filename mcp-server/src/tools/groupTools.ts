@@ -97,7 +97,7 @@ export class GroupTools {
       // Compatible with MCP clients that send files as a string (try JSON.parse or wrap in a single-element array)
       const filesArray = normalizeFilesParam(args.files);
       
-      if (!name) {
+      if (!name?.trim()) {
         return Logger.createError(ErrorType.VALIDATION_ERROR, 'Group name must not be empty', 'Please provide the name parameter');
       }
       
@@ -159,7 +159,7 @@ export class GroupTools {
     try {
       const { groupId, newName } = args;
       
-      if (!groupId || !newName) {
+      if (!groupId || !newName?.trim()) {
         return Logger.createError(ErrorType.VALIDATION_ERROR, 'groupId and newName are required parameters');
       }
       

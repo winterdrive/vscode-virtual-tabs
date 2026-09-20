@@ -4,7 +4,7 @@ This guide provides detailed instructions on how to configure the VirtualTabs MC
 
 ## 🔌 Core Concepts
 
-VirtualTabs ships with a fully bundled MCP server (`dist/mcp/index.js`) that exposes 15+ tools for AI agents (Cursor, Copilot, Claude, Kiro, Antigravity) to manage your workspace groups programmatically.
+VirtualTabs ships with a fully bundled MCP server (`dist/mcp/index.js`) that lets AI agents (Cursor, Copilot, Claude, Kiro, Antigravity) manage your workspace groups programmatically. The current primitive and tool catalog is maintained in the [MCP server reference](../mcp-server/README.md#registered-primitives).
 
 > [!IMPORTANT]
 > **VirtualTabs groups are purely virtual.** AI tools will *never* move or modify your actual files on disk through these tools. They only manage the logical organization within the VirtualTabs UI.
@@ -49,7 +49,7 @@ VirtualTabs can install the canonical agent skill, and can write custom skill/ru
 
 Command: `VirtualTabs: Install Agent Skill`. Choose **Auto Install (Recommended)** for the standard install path, or **Generate Skill Files Manually** for agent-specific files.
 
-The generated skill includes a **four-layer safety decision tree** to ensure the AI uses the tools correctly and safely.
+The installed or generated skill follows the canonical behavior and safety workflow in [`skills/virtualtabs/SKILL.md`](../skills/virtualtabs/SKILL.md).
 
 ![Safety Decision Tree](./assets/safety_decision_tree_en.png)
 
