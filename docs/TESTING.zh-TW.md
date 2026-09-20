@@ -4,7 +4,7 @@
 
 繁體中文 | [English](./TESTING.md)
 
-這是本儲存庫 **v0.13.0 pre-release 發版列車**自動化測試套件目前維護中的權威參考文件。目前根目錄基準為 **38 個套件／250 個測試**（34 個單元測試套件與 4 個屬性測試套件）。如果您發現有較舊的本地筆記描述特定過往議題的手動測試檢查清單，那些都不能反映目前實際的測試套件——請勿用來判斷目前的行為或覆蓋率。
+這是本儲存庫 **v0.15.0 pre-release 發版列車**自動化測試套件目前維護中的權威參考文件。目前根目錄基準為 **41 個套件／261 個測試**（37 個單元測試套件與 4 個屬性測試套件）。如果您發現有較舊的本地筆記描述特定過往議題的手動測試檢查清單，那些都不能反映目前實際的測試套件——請勿用來判斷目前的行為或覆蓋率。
 
 若您新增、重新命名或移除測試檔案，請在同一個 PR 中一併更新本文件。
 
@@ -49,6 +49,7 @@ editorGrouper/VirtualTabs 本身）共用同一份快取，而不必各自下載
 | `bookmarkManager.test.ts` | `BookmarkManager` 在查詢用的 URI 序列化結果與儲存鍵值不同時的 URI 比對邏輯、透過正規化比對進行更新／移除、跨群組 `findBookmarkKey` 查詢（用於拖放移動）、針對以工作區相對路徑儲存的 `createBookmark` 測試，以及拒絕非有限值或非整數的行號 |
 | `builtInGroupInit.test.ts` | 內建群組的注入條件：修正後的 `!groups.some(g => g.builtIn)` 判斷式，即使使用者群組已經存在也會注入內建群組（不同於舊版有問題的 `groups.length === 0` 判斷式，本檔案也將其列為有記錄的回歸基準一併測試），並確保內建群組永遠排在第一個且不會重複注入 |
 | `builtInGroupSyncPersistence.test.ts` | 內建分頁與 editor-group topology 快照會刷新 TreeView 而不重寫設定檔；重複事件會被忽略；scoped create 與 built-in Duplicate 會先呈現 UI，再只 debounce 儲存目標 scope；multi-root Duplicate 會進入 Workspace Config，single-folder 則進入其 folder scope |
+| `commandsGetAllFilesRecursiveCycleGuard.test.ts` | 命令層的遞迴檔案收集會委派給共用且具循環防護的走訪 helper，每個巢狀檔案只回傳一次，且遇到多群組循環或自我參照循環時都能正確終止 |
 | `configReloadNotification.test.ts` | `buildReloadMessage`／`dispatchReloadNotification`：i18n 訊息的備援鏈（fallback chain）、成功時使用 `setStatusBarMessage`（3000ms）而非彈出視窗通知、在內部儲存或重新載入失敗時抑制通知 |
 | `copyGroupName.test.ts` | `I18n.stripCopyPostfix`：移除結尾的「copy」後綴（不論是否帶有索引數字）、不符合格式的名稱維持不變，並透過 `getCopyGroupName` 進行往返測試，確保重複複製不會疊加後綴 |
 | `dragAndDropHiddenFiles.test.ts` | 拖放資料夾展開時會過濾掉以點號開頭的隱藏資料夾（例如 `.git`），但仍會顯示以點號開頭的隱藏*檔案*（例如 `.gitignore`），並正確跳過隱藏資料夾底下的所有子項目 |
@@ -65,6 +66,8 @@ editorGrouper/VirtualTabs 本身）共用同一份快取，而不必各自下載
 | `getScopeLabel.test.ts` | Scope label 透過 `scope.label` 使用 VS Code 的 `WorkspaceFolder.name`，涵蓋 multi-root 自訂顯示名稱，以及 `path.basename` 會回傳空值的磁碟根目錄資料夾 |
 | `i18nGetMessage.test.ts` | `I18n.getMessage` 的佔位符替換：一般參數、參數中的字面 `$` 不會被當作替換樣式處理、參數中的 `$&`／`$$`／`$1` 樣式不會被展開、多個佔位符會各自獨立替換 |
 | `legacyMigration.test.ts` | 將舊版單一值設定 `virtualTabs.activeScope` 遷移至新版 `activeScopes` 陣列：非空的舊值會被包成陣列、只要新鍵存在就優先使用新鍵（即使是空陣列，代表「使用者已清除篩選」也一樣），且兩個鍵都不存在時回傳空值 |
+| `mcpConfigPanelEscapeHtml.test.ts` | MCP 設定 webview 會逸出 HTML 特殊字元，包括刻意嘗試跳脫 `<option>` 元素的工作區資料夾名稱，同時保持一般名稱不變 |
+| `moveGroupUnderGroupCycleGuard.test.ts` | 驅動真實的 `TempFoldersProvider.moveGroupUnderGroup` production path：允許移到不相關群組、拒絕移到直接或多層後代之下，且既存的循環 parent chain 仍能安全終止 |
 | `projectExplorerMaxResults.test.ts` | `ProjectExplorer.exploreProject` 的 `maxResults` 驗證：負數、零，以及非整數值都會回退為預設值（特別是負數不會從陣列尾端進行切片），有效的正數值仍會正確截斷 |
 | `removeFilesFromGroup.test.ts` | 針對重新載入後（以工作區相對路徑儲存）的群組測試 `TempFoldersProvider.removeFilesFromGroup`：單一／多個檔案移除、群組屬於不同資料夾時能正確解析來源範圍根目錄、沒有來源範圍的舊版群組會回退至工作區根目錄、移除檔案時一併移除對應書籤，以及選取內容不符合已儲存項目時不做任何動作 |
 | `scopeDescription.test.ts` | `computeScopeDescription`：無篩選（undefined）、僅內建、單一／多個 repo 範圍標籤、「N 個範圍」的計數，以及過期 id 的篩選（不再存在於 `configScopes` 中的 id 不計入計數） |

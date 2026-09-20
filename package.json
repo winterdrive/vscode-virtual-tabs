@@ -2,7 +2,7 @@
     "name": "virtual-tabs",
     "displayName": "VirtualTabs - Virtual File Directories & AI context management",
     "description": "%extension.description%",
-    "version": "0.14.0",
+    "version": "0.15.0",
     "publisher": "winterdrive",
     "icon": "docs/assets/virtualtabs_icon_128.png",
     "categories": [

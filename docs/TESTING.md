@@ -3,8 +3,8 @@
 [繁體中文](./TESTING.zh-TW.md) | English
 
 This is the current, maintained reference for this repo's **automated** test
-suites (v0.13.0 pre-release train). The current root baseline is **38 suites /
-250 tests** (34 unit suites and 4 property suites). If you find older local notes describing manual test
+suites (v0.15.0 pre-release train). The current root baseline is **41 suites /
+261 tests** (37 unit suites and 4 property suites). If you find older local notes describing manual test
 checklists for specific past issues, they don't describe the actual current
 suite — don't use them to judge current behavior or coverage.
 
@@ -53,6 +53,7 @@ PromptManager's `mcp-server/`) — `mcp-server/` here is build-only (`tsc`,
 | `bookmarkManager.test.ts` | `BookmarkManager` URI matching when the lookup URI serializes differently from the stored key, update/remove through normalized matching, cross-group `findBookmarkKey` lookups for drag-and-drop moves, `createBookmark` against workspace-relative stored paths, and rejection of non-finite or non-integer line numbers |
 | `builtInGroupInit.test.ts` | Built-in group injection condition: the fixed `!groups.some(g => g.builtIn)` check injects built-in even when user groups already exist (unlike the old buggy `groups.length === 0` check, which is also tested here as a documented regression baseline), keeps it first, and never double-injects |
 | `builtInGroupSyncPersistence.test.ts` | Built-in tab and editor-group topology snapshots refresh the TreeView without rewriting config; duplicate events are ignored; scoped creates and built-in duplication paint before a target-only debounced save; multi-root duplication targets Workspace Config and single-folder duplication targets its folder scope |
+| `commandsGetAllFilesRecursiveCycleGuard.test.ts` | Command-layer recursive file collection delegates to the shared cycle-safe traversal helper, returns each nested file once, and terminates on both multi-group and self-referential cycles |
 | `configReloadNotification.test.ts` | `buildReloadMessage`/`dispatchReloadNotification`: i18n message fallback chain, uses `setStatusBarMessage` (3000ms) rather than a popup on success, suppresses notification during internal saves or failed reloads |
 | `copyGroupName.test.ts` | `I18n.stripCopyPostfix`: strips a trailing "copy" postfix with/without an index, leaves non-matching names unchanged, and round-trips through `getCopyGroupName` so repeated duplication doesn't stack postfixes |
 | `dragAndDropHiddenFiles.test.ts` | Drag-drop folder expansion filters out dot-prefixed hidden folders (e.g. `.git`) while still surfacing dot-prefixed hidden *files* (e.g. `.gitignore`), and correctly skips all descendants of a hidden folder |
@@ -69,6 +70,8 @@ PromptManager's `mcp-server/`) — `mcp-server/` here is build-only (`tsc`,
 | `getScopeLabel.test.ts` | Scope labels use VS Code's `WorkspaceFolder.name` through `scope.label`, including custom multi-root display names and filesystem-root folders where `path.basename` would be empty |
 | `i18nGetMessage.test.ts` | `I18n.getMessage` placeholder substitution: plain args, literal `$` in an argument isn't treated as a replacement pattern, `$&`/`$$`/`$1`-style patterns in an argument aren't expanded, multiple placeholders substituted independently |
 | `legacyMigration.test.ts` | Migration of the old single-value `virtualTabs.activeScope` setting to the new `activeScopes` array: wraps a non-empty old value, prefers the new key whenever present (even as an empty array, meaning "user cleared the filter"), and returns empty when neither key is set |
+| `mcpConfigPanelEscapeHtml.test.ts` | MCP configuration webview escaping for HTML-significant characters, including workspace-folder names crafted to break out of an `<option>` element, while preserving ordinary names |
+| `moveGroupUnderGroupCycleGuard.test.ts` | Drives the real `TempFoldersProvider.moveGroupUnderGroup` production path: unrelated moves succeed, direct and multi-level descendant moves are rejected, and an existing cyclic parent chain terminates safely |
 | `projectExplorerMaxResults.test.ts` | `ProjectExplorer.exploreProject`'s `maxResults` validation: negative, zero, and non-integer values all fall back to the default (negative specifically doesn't slice from the array's end), a valid positive value still truncates |
 | `removeFilesFromGroup.test.ts` | `TempFoldersProvider.removeFilesFromGroup` against reloaded (workspace-relative-path) groups: single/multiple file removal, correct source-scope-root resolution when groups belong to different folders, fallback to workspace root for legacy groups without a source scope, bookmark removal alongside file removal, and no-op when selection doesn't match stored entries |
 | `scopeDescription.test.ts` | `computeScopeDescription`: no-filter (undefined), built-in-only, single/multiple repo scope labels, "N scopes" counting, and stale-id filtering (ids no longer in `configScopes` are excluded from the count) |

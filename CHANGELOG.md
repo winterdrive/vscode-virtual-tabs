@@ -2,6 +2,14 @@
 
 All notable changes to the "VirtualTabs" extension will be documented in this file.
 
+## [0.15.0] - MCP Input Hardening & Cycle Safety (pre-release) - 2026-09-20
+
+- **fix(dragAndDrop):** stop a cross-group file drag from duplicating the file — the source-group removal compared a raw string against `vscode.Uri`'s percent-encoded `toString()` output, which never matched a stored entry whose colon (e.g. a Windows drive letter) wasn't encoded, so the removal silently no-op'd while the file was still added to the target group; the single-file `deleteFile` command had the same bug, where it could silently fail to remove the file at all ([#154](https://github.com/winterdrive/vscode-virtual-tabs/pull/154), fixes [#153](https://github.com/winterdrive/vscode-virtual-tabs/issues/153)).
+- **fix(mcp):** escape workspace-folder names and ids before rendering them in MCP configuration webview options, preventing workspace metadata from injecting HTML ([#146](https://github.com/winterdrive/vscode-virtual-tabs/pull/146)).
+- **fix(commands):** route recursive group file collection through the shared cycle-safe traversal helper, preventing malformed cyclic group data from overflowing the stack ([#148](https://github.com/winterdrive/vscode-virtual-tabs/pull/148)).
+- **fix(mcp):** reject whitespace-only names in `create_group` and `rename_group` instead of accepting groups that appear unnamed ([#147](https://github.com/winterdrive/vscode-virtual-tabs/pull/147)).
+- **fix(provider):** reject attempts to move a group beneath one of its descendants, with production-path regression coverage for direct, multi-level, and pre-existing cyclic parent chains ([#145](https://github.com/winterdrive/vscode-virtual-tabs/pull/145)).
+
 ## [0.14.0] - Stable Release: Multi-Root State Consistency & Reload Safety - 2026-09-20
 
 - **Stable Promotion:** promotes the tested `0.13.0` multi-root and state-consistency batch to the stable channel, including #120, #121, #122, #123, #126, #127, #128, #140, and #141.
