@@ -26,7 +26,7 @@ import {
     ViewControl,
     VSBrowser
 } from 'vscode-extension-tester';
-import { By, Key } from 'selenium-webdriver';
+import { By, Key, WebElement } from 'selenium-webdriver';
 import { expect } from 'chai';
 
 // ─── Fixture paths ─────────────────────────────────────────────────────────────
@@ -187,24 +187,31 @@ async function findTreeItem(section: CustomTreeSection, label: string, timeoutMs
  * Right-click the tree row matching `rowLabel`, collect top-level context menu item
  * labels, then dismiss with Escape.
  */
-async function getContextMenuItemsFor(rowLabel: string | RegExp, timeoutMs = 12_000, preClick = false): Promise<string[]> {
+async function getContextMenuItemsFor(rowLabelOrElement: string | RegExp | WebElement, timeoutMs = 12_000, preClick = false): Promise<string[]> {
     const driver = VSBrowser.instance.driver;
 
     await dismissContextViews();
 
-    const row = await driver.wait(async () => {
-        const rows = await driver.findElements(By.css('.monaco-list-row'));
-        for (const r of rows) {
-            try {
-                const text = (await r.getText()).trim();
-                const matches = typeof rowLabel === 'string'
-                    ? text.includes(rowLabel)
-                    : rowLabel.test(text);
-                if (matches) { return r; }
-            } catch { /* stale ref — retry */ }
-        }
-        return null;
-    }, timeoutMs, `Tree row matching "${rowLabel}" not found for context menu`) as Awaited<ReturnType<typeof driver.findElement>>;
+    // A caller may pass an already-resolved WebElement (e.g. from
+    // TreeItem.findChildItem()) to target a specific row unambiguously,
+    // instead of a global basename search that can match an unrelated row
+    // with the same displayed text (see the "Executable File (Custom Group)"
+    // and "Non-exec File regression" suites).
+    const row = rowLabelOrElement instanceof WebElement
+        ? rowLabelOrElement
+        : await driver.wait(async () => {
+            const rows = await driver.findElements(By.css('.monaco-list-row'));
+            for (const r of rows) {
+                try {
+                    const text = (await r.getText()).trim();
+                    const matches = typeof rowLabelOrElement === 'string'
+                        ? text.includes(rowLabelOrElement)
+                        : rowLabelOrElement.test(text);
+                    if (matches) { return r; }
+                } catch { /* stale ref — retry */ }
+            }
+            return null;
+        }, timeoutMs, `Tree row matching "${rowLabelOrElement}" not found for context menu`) as Awaited<ReturnType<typeof driver.findElement>>;
 
     if (preClick) {
         await driver.actions().click(row).perform();
@@ -243,22 +250,24 @@ async function getContextMenuItemsFor(rowLabel: string | RegExp, timeoutMs = 12_
  * Hover over the tree row matching `rowLabel` and return aria-labels of visible
  * inline action buttons.
  */
-async function getInlineActionLabelsFor(rowLabel: string | RegExp, timeoutMs = 12_000): Promise<string[]> {
+async function getInlineActionLabelsFor(rowLabelOrElement: string | RegExp | WebElement, timeoutMs = 12_000): Promise<string[]> {
     const driver = VSBrowser.instance.driver;
 
-    const row = await driver.wait(async () => {
-        const rows = await driver.findElements(By.css('.monaco-list-row'));
-        for (const r of rows) {
-            try {
-                const text = (await r.getText()).trim();
-                const matches = typeof rowLabel === 'string'
-                    ? text.includes(rowLabel)
-                    : rowLabel.test(text);
-                if (matches) { return r; }
-            } catch { /* stale */ }
-        }
-        return null;
-    }, timeoutMs, `Tree row matching "${rowLabel}" not found for inline actions`) as Awaited<ReturnType<typeof driver.findElement>>;
+    const row = rowLabelOrElement instanceof WebElement
+        ? rowLabelOrElement
+        : await driver.wait(async () => {
+            const rows = await driver.findElements(By.css('.monaco-list-row'));
+            for (const r of rows) {
+                try {
+                    const text = (await r.getText()).trim();
+                    const matches = typeof rowLabelOrElement === 'string'
+                        ? text.includes(rowLabelOrElement)
+                        : rowLabelOrElement.test(text);
+                    if (matches) { return r; }
+                } catch { /* stale */ }
+            }
+            return null;
+        }, timeoutMs, `Tree row matching "${rowLabelOrElement}" not found for inline actions`) as Awaited<ReturnType<typeof driver.findElement>>;
 
     await driver.actions().move({ origin: row }).perform();
     await driver.sleep(400);
@@ -306,25 +315,24 @@ describe('Menu Availability Matrix – Executable File (Custom Group) (virtualTa
         await groupItem.expand();
         await waitForTreeLabel(EXEC_BASENAME);
 
-        // Left-click to set virtualTabs:hasFileSelected and virtualTabs:hasCustomFileSelected
         const driver = VSBrowser.instance.driver;
-        await driver.wait(async () => {
-            const rows = await driver.findElements(By.css('.monaco-list-row'));
-            for (const r of rows) {
-                try {
-                    if ((await r.getText()).includes(EXEC_BASENAME)) {
-                        await r.click();
-                        return true;
-                    }
-                } catch { /* stale */ }
-            }
-            return false;
-        }, 10_000, `Could not left-click exec file row "${EXEC_BASENAME}"`);
 
+        // Resolve the file row scoped to this specific custom group rather than
+        // a global basename search. Left-clicking opens the file in the editor,
+        // which makes the built-in "Currently Open Files" group surface its own
+        // row with the same basename above this group — a plain-text search
+        // would grab that built-in row instead.
+        const fileItem = await driver.wait(async () => {
+            try { return (await groupItem.findChildItem(EXEC_BASENAME)) ?? false; }
+            catch { return false; }
+        }, 10_000, `Could not find file "${EXEC_BASENAME}" inside group "${GROUP_NAME}"`) as TreeItem;
+
+        // Left-click to set virtualTabs:hasFileSelected and virtualTabs:hasCustomFileSelected
+        await fileItem.click();
         await driver.sleep(500);
 
-        ctxItems = await getContextMenuItemsFor(EXEC_BASENAME, 12_000, true);
-        inlineLabels = await getInlineActionLabelsFor(EXEC_BASENAME);
+        ctxItems = await getContextMenuItemsFor(fileItem, 12_000, true);
+        inlineLabels = await getInlineActionLabelsFor(fileItem);
 
         expect(ctxItems.length, `Context menu returned no items for "${EXEC_BASENAME}". Items: [${ctxItems.join(', ')}]`).to.be.greaterThan(0);
         expect(inlineLabels.length, `No inline action buttons found for "${EXEC_BASENAME}". Labels: [${inlineLabels.join(', ')}]`).to.be.greaterThan(0);
@@ -520,21 +528,18 @@ describe('Menu Availability Matrix – Non-exec File regression: no "Run" button
         await waitForTreeLabel(PLAIN_BASENAME);
 
         const driver = VSBrowser.instance.driver;
-        await driver.wait(async () => {
-            const rows = await driver.findElements(By.css('.monaco-list-row'));
-            for (const r of rows) {
-                try {
-                    if ((await r.getText()).includes(PLAIN_BASENAME)) {
-                        await r.click();
-                        return true;
-                    }
-                } catch { /* stale */ }
-            }
-            return false;
-        }, 10_000, `Could not left-click plain file row "${PLAIN_BASENAME}"`);
 
+        // Resolve the file row scoped to this specific custom group rather than
+        // a global basename search — see the "Executable File (Custom Group)"
+        // suite above for why a plain-text search is unsafe here.
+        const fileItem = await driver.wait(async () => {
+            try { return (await groupItem.findChildItem(PLAIN_BASENAME)) ?? false; }
+            catch { return false; }
+        }, 10_000, `Could not find file "${PLAIN_BASENAME}" inside group "${GROUP_NAME}"`) as TreeItem;
+
+        await fileItem.click();
         await driver.sleep(500);
-        inlineLabels = await getInlineActionLabelsFor(PLAIN_BASENAME);
+        inlineLabels = await getInlineActionLabelsFor(fileItem);
 
         // Guard: the "Remove" button confirms we have a real custom file item.
         expect(inlineLabels.some(l => l === 'Remove'), `"Remove" not found — wrong item? Labels: [${inlineLabels.join(', ')}]`).to.be.true;

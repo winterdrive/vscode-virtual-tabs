@@ -38,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify generated LLM context
+        run: npm run docs:llms:check
+
       - name: Validate version bump
         if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'release-ready')
         run: |

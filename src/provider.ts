@@ -561,7 +561,15 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
                     const migrated = this.migrateGroups(saved);
                     const restored = this.fromStorageGroups(migrated, scopeRoot);
                     // 注入 sourceScopeId
-                    const withScopeId = restored.map(g => ({ ...g, sourceScopeId: scopeId }));
+                    // 過濾任何殘留的 builtIn 標記：內建群組不應該持久化（見
+                    // saveGroupsImmediate 的排除邏輯），但舊版本或手動編輯可能
+                    // 讓 builtIn: true 的項目意外寫入檔案。若不過濾，這裡會把
+                    // 它當成一般群組載入，疊加在上方保留的既有內建群組之上，
+                    // 每次 reload 都多一份，導致「目前已開啟檔案」重複顯示且
+                    // 持續增加。
+                    const withScopeId = restored
+                        .filter(g => !g.builtIn)
+                        .map(g => ({ ...g, sourceScopeId: scopeId }));
                     this.groups.push(...withScopeId);
                 }
                 return true;
@@ -583,7 +591,13 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
                     const migrated = this.migrateGroups(saved);
                     const restored = this.fromStorageGroups(migrated, scope.uri.fsPath);
                     // 注入 sourceScopeId
-                    const withScopeId = restored.map(g => ({ ...g, sourceScopeId: scope.id }));
+                    // 過濾任何殘留的 builtIn 標記，理由同上：內建群組本不該
+                    // 持久化，若檔案裡意外存有 builtIn: true 的項目，會跟下方
+                    // 保留的既有內建群組疊加，造成「目前已開啟檔案」重複顯示
+                    // 且每次 reinitializeScopes()/reload 都再增加一份。
+                    const withScopeId = restored
+                        .filter(g => !g.builtIn)
+                        .map(g => ({ ...g, sourceScopeId: scope.id }));
                     allGroups.push(...withScopeId);
                 } else {
                     console.error(`VirtualTabs: Loaded data for scope "${scope.id}" failed validation`);
