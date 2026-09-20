@@ -566,14 +566,13 @@ export function registerCommands(
 
 
         const executeDelete = () => {
-            if (filesToRemove.length > 1) {
-                provider.removeFilesFromGroup(item.groupIdx, filesToRemove);
-            } else {
-                const group = provider.groups[item.groupIdx];
-                if (!group || !group.files) return;
-                group.files = group.files.filter(uri => uri !== item.uri.toString());
-                provider.refresh();
-            }
+            // removeFilesFromGroup() already matches by fsPath (via
+            // removeStoredFileEntriesFromGroup), so it's safe for a single file
+            // too — a hand-rolled `uri !== item.uri.toString()` filter here would
+            // silently fail to remove entries whose stored encoding differs from
+            // item.uri.toString() (e.g. an unencoded drive-letter colon vs.
+            // vscode.Uri's percent-encoded one), leaving the file in the group.
+            provider.removeFilesFromGroup(item.groupIdx, filesToRemove);
         };
 
         const message = filesToRemove.length > 1

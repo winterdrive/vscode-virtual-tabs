@@ -4,6 +4,7 @@ import { TempFolderItem, TempFileItem, ScopeHeaderItem, EditorGroupItem } from '
 import { I18n } from './i18n';
 import { extractDataTransferFileUris, formatDraggedFilesPlainText, parseUriList, uniqueUriStrings } from './core/DropUriParser';
 import { BookmarkManager } from './core/BookmarkManager';
+import { removeStoredFileEntriesFromGroup } from './core/GroupFileRemoval';
 
 // Drag-and-drop controller, allows files to be dragged into groups AND groups to be nested
 export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropController<vscode.TreeItem> {
@@ -293,14 +294,27 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
             }
 
             // 2. Move File
-            // Remove from source group
+            // Remove from source group. Compare via the shared fsPath-based matcher,
+            // not a raw string filter: the dragged item's URI can re-serialize with
+            // different encoding than what's stored on the group (e.g.
+            // vscode.Uri.parse(...).toString() percent-encodes a Windows
+            // drive-letter colon while the in-memory value produced by
+            // PathUtils.toFileUri() does not). A strict `!==` filter then silently
+            // fails to remove the entry, leaving the file duplicated in both groups.
             if (sourceGroup.files) {
-                sourceGroup.files = sourceGroup.files.filter(uri => uri !== fileUri);
+                const sourceScopeRoot = sourceGroup.sourceScopeId
+                    ? this.provider.configScopes.find(s => s.id === sourceGroup.sourceScopeId)?.uri.fsPath
+                    : undefined;
+                removeStoredFileEntriesFromGroup(
+                    sourceGroup,
+                    [{ uri: fileUri, fsPath: fileItem.uri.fsPath }],
+                    sourceScopeRoot
+                );
             }
 
             // Add to target group (fsPath comparison to handle URI encoding differences)
             if (!targetGroup.files) targetGroup.files = [];
-            const incomingFsPath = vscode.Uri.parse(fileUri).fsPath;
+            const incomingFsPath = fileItem.uri.fsPath;
             const alreadyExists = targetGroup.files.some(f => {
                 try { return vscode.Uri.parse(f).fsPath === incomingFsPath; }
                 catch { return f === fileUri; }
