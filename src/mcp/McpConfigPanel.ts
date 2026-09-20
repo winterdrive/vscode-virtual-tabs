@@ -31,6 +31,17 @@ interface WorkspaceOption {
     path: string;
 }
 
+// Workspace folder names can come from an untrusted .code-workspace file or
+// folder basename, so they must be escaped before landing in webview HTML.
+export function escapeHtml(value: string): string {
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 export class McpConfigPanel {
     public static currentPanel: McpConfigPanel | undefined;
     private readonly _panel: vscode.WebviewPanel;
@@ -247,7 +258,7 @@ export class McpConfigPanel {
         const workspaceOptionsHtml = workspaceContext.workspaces.length > 0
             ? workspaceContext.workspaces.map(workspace => {
                 const selected = workspace.id === workspaceContext.selectedWorkspaceId ? 'selected' : '';
-                return `<option value="${workspace.id}" ${selected}>${workspace.name}</option>`;
+                return `<option value="${escapeHtml(workspace.id)}" ${selected}>${escapeHtml(workspace.name)}</option>`;
             }).join('')
             : `<option value="__none__">${i18n.workspaceEmpty}</option>`;
 

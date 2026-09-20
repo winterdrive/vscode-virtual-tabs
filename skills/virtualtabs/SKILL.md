@@ -15,12 +15,19 @@ This project uses VirtualTabs to organize files into **virtual groups** across d
 
 ## MCP Server Setup
 
-To configure the MCP server for your AI tool:
+The canonical human-facing setup reference is the
+[MCP Setup Guide](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/docs/mcp-setup.md).
+The minimum connection steps quoted here are intentionally embedded so an
+installed skill can recover when the MCP server is unavailable:
 1. Open VS Code Command Palette (Ctrl+Shift+P)
 2. Run: **VirtualTabs: Show MCP Config**
 3. Follow the instructions for your specific AI tool
 
 ## Available Tools
+
+The [MCP server reference](https://github.com/winterdrive/vscode-virtual-tabs/blob/main/mcp-server/README.md#registered-primitives)
+is the canonical capability catalog. The list below is an embedded operational
+excerpt for installed skills and must remain synchronized with that source.
 
 ### Core Operations
 

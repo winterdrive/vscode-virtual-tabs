@@ -5,7 +5,7 @@ import { TempFileItem, TempFolderItem, BookmarkItem } from './treeItems';
 import { I18n } from './i18n';
 import { BookmarkManager } from './core/BookmarkManager';
 import { TempGroup } from './types';
-import { executeWithConfirmation } from './util';
+import { executeWithConfirmation, getAllFilesInGroupRecursive } from './util';
 import { SkillGenerator } from './mcp/SkillGenerator';
 import { McpConfigPanel } from './mcp/McpConfigPanel';
 import { SendToManager } from './sendTo';
@@ -190,28 +190,6 @@ async function openFileDefault(uri: vscode.Uri): Promise<void> {
         return;
     }
     await openFileInEditor(uri);
-}
-
-/**
- * Get all files from a group and its child groups (recursive)
- */
-function getAllFilesInGroupRecursive(groups: TempGroup[], groupId: string): string[] {
-    const allFiles: string[] = [];
-
-    const collectFiles = (gId: string) => {
-        const group = groups.find(g => g.id === gId);
-        if (group && group.files) {
-            allFiles.push(...group.files);
-        }
-        // Find child groups
-        const children = groups.filter(g => g.parentGroupId === gId);
-        for (const child of children) {
-            collectFiles(child.id);
-        }
-    };
-
-    collectFiles(groupId);
-    return allFiles;
 }
 
 /**

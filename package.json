@@ -2,7 +2,7 @@
     "name": "virtual-tabs",
     "displayName": "VirtualTabs - Virtual File Directories & AI context management",
     "description": "%extension.description%",
-    "version": "0.13.0",
+    "version": "0.14.0",
     "publisher": "winterdrive",
     "icon": "docs/assets/virtualtabs_icon_128.png",
     "categories": [
@@ -688,6 +688,8 @@
         "test:ui": "tsc -p tsconfig.test.ui.json && extest setup-and-run \"out/test/ui/**/*.test.js\" -e \".vscode-test/extensions\" -r \"test-resources/multi-root/virtual-tabs.code-workspace\" -c 1.96.0",
         "test:ui:demo": "node src/test/ui/demo/write-demo-settings.cjs && tsc -p tsconfig.test.ui.json && node -e \"const fs=require('fs');const p=require('path').join(require('os').tmpdir(),'test-resources','settings');if(fs.existsSync(p))fs.rmSync(p,{recursive:true,force:true})\" && extest setup-and-run \"out/test/ui/demo/groupOrganize.demo.js\" -e \".vscode-test/extensions\" -r \"test-resources/demo-workspace\" -c 1.96.0 -o \"test-results/demo-vscode-settings.generated.json\"",
         "test:ui:selfroot": "tsc -p tsconfig.test.ui.json && extest setup-and-run \"out/test/ui/selfRoot/**/*.selfroot.js\" -e \".vscode-test/extensions\" -r \"test-resources/self-root/project.code-workspace\" -c 1.96.0",
+        "docs:llms": "node scripts/generate-llms-full.mjs",
+        "docs:llms:check": "node scripts/generate-llms-full.mjs --check",
         "vscode:prepublish": "npm run build:vt && npm run build:mcp && tsc -p ./ && npm run build:skills",
         "build:mcp": "esbuild mcp-server/src/index.ts --bundle --platform=node --target=node18 --format=cjs --outfile=dist/mcp/index.js --external:vscode",
         "build:vt": "npx tsx scripts/bundle-vt.ts",

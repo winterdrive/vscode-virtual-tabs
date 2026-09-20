@@ -1,11 +1,6 @@
 name: Publish Extension
 
-# Versioning convention:
-#   Odd minor  (e.g. 0.7.0, 0.9.0)  → pre-release tier  (published with --pre-release)
-#   Even minor (e.g. 0.8.0, 1.0.0)  → stable tier       (published normally)
-#
-# CI reads the minor version from package.json at merge time and sets the flag automatically.
-# You never need to pass --pre-release manually.
+# Release governance SSOT: docs/RELEASE_POLICY.md
 
 on:
   workflow_dispatch:
@@ -13,7 +8,7 @@ on:
     branches:
       - main
     paths:
-      - 'package.json' # 只有版本號更新時才觸發，避免浪費資源
+      - 'package.json' # Trigger only for version changes to avoid unnecessary runs.
 
 permissions:
   contents: read
@@ -27,7 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 取得完整歷史以便比對版本號
+          fetch-depth: 0 # Fetch full history for version comparison.
 
       - name: Check if version changed
         id: check_version
