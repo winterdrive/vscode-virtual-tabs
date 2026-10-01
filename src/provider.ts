@@ -1166,6 +1166,7 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
         // 1. Find all descendants recursively
         const idsToRemove = new Set<string>();
         const collectIds = (currentId: string) => {
+            if (idsToRemove.has(currentId)) return;
             idsToRemove.add(currentId);
             const children = this.groups.filter(g => g.parentGroupId === currentId);
             for (const child of children) {
