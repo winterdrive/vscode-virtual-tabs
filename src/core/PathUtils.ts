@@ -26,7 +26,10 @@ export class PathUtils {
     try {
       const absolutePath = this.toAbsolutePath(filePath);
       const relativePath = path.relative(this.workspaceRoot, absolutePath);
-      return !relativePath.startsWith('..') && !path.isAbsolute(relativePath);
+      // Only a leading `..` *segment* escapes the workspace; a first segment
+      // that merely starts with dots (e.g. `..config/file.ts`) is still inside.
+      const escapesRoot = relativePath === '..' || relativePath.startsWith('..' + path.sep);
+      return !escapesRoot && !path.isAbsolute(relativePath);
     } catch (error) {
       return false;
     }
