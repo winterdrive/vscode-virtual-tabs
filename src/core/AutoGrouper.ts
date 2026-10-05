@@ -90,7 +90,9 @@ export class AutoGrouper {
     const oneDay = 24 * 60 * 60 * 1000;
     const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
     const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
-    return Math.floor(Math.abs(d2.getTime() - d1.getTime()) / oneDay);
+    // Round rather than floor: local midnights that straddle a DST transition
+    // are 23h or 25h apart, so flooring would put "yesterday" into "today".
+    return Math.round(Math.abs(d2.getTime() - d1.getTime()) / oneDay);
   }
 
   /**
