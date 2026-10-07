@@ -107,13 +107,17 @@ export class ProjectExplorer {
     const fd = fs.openSync(absolutePath, 'r');
 
     try {
-      fs.readSync(fd, buffer, 0, Math.min(size, MAX_SIZE), 0);
+      // Use the actual byte count: if the file shrank after statSync (or the read
+      // was short), the untouched tail of the zero-filled buffer would otherwise be
+      // mistaken for NUL bytes and reported as a binary file.
+      const bytesRead = fs.readSync(fd, buffer, 0, buffer.length, 0);
+      const data = buffer.subarray(0, bytesRead);
 
-      if (buffer.includes(0)) {
+      if (data.includes(0)) {
         throw new Error('Binary files are not supported');
       }
 
-      const content = buffer.toString('utf8');
+      const content = data.toString('utf8');
       return { path: absolutePath, content, size, truncated };
     } finally {
       fs.closeSync(fd);
