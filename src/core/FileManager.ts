@@ -6,6 +6,7 @@
  * Requirements: 10.1, 10.4
  */
 
+import * as path from 'path';
 import { PathUtils } from './PathUtils.js';
 import { GroupManager } from './GroupManager.js';
 import { matchesStoredFileEntry } from './FileEntryMatcher.js';
@@ -83,8 +84,17 @@ export class FileManager {
         continue;
       }
 
-      const fileUri = this.toFileUri(filePath);
       const targetFsPath = this.toAbsolutePath(filePath);
+
+      // A blank entry (e.g. an MCP client sending "" or ".") resolves to the
+      // workspace root itself; storing that directory as a group "file" would
+      // leave an entry that cannot be opened, so report it as invalid instead.
+      if (path.relative(this.pathUtils.getWorkspaceRoot(), targetFsPath) === '') {
+        result.invalid.push(filePath);
+        continue;
+      }
+
+      const fileUri = this.toFileUri(filePath);
       const workspaceRoot = this.groupManager.getWorkspaceRoot();
 
       if (group.files.some(entry => matchesStoredFileEntry(entry, fileUri, targetFsPath, workspaceRoot))) {
