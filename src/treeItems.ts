@@ -156,13 +156,23 @@ export class BookmarkItem extends vscode.TreeItem {
      */
     private createTooltip(): vscode.MarkdownString {
         const tooltip = new vscode.MarkdownString();
-        tooltip.appendMarkdown(`**${this.bookmark.label}** (line ${this.bookmark.line + 1})\n\n`);
+        // User-provided text (label, description) and the file path go through
+        // appendText so Markdown syntax in them is escaped. Otherwise labels
+        // with '*', '_' or '[' render wrongly, and Windows paths lose the
+        // backslash before punctuation (e.g. 'C:\proj\.vscode' -> 'C:\proj.vscode').
+        tooltip.appendMarkdown('**');
+        tooltip.appendText(this.bookmark.label);
+        tooltip.appendMarkdown(`** (line ${this.bookmark.line + 1})\n\n`);
 
         if (this.bookmark.description) {
-            tooltip.appendMarkdown(`*${this.bookmark.description}*\n\n`);
+            tooltip.appendMarkdown('*');
+            tooltip.appendText(this.bookmark.description);
+            tooltip.appendMarkdown('*\n\n');
         }
 
-        tooltip.appendMarkdown(`📁 ${this.fileUri.fsPath}\n`);
+        tooltip.appendMarkdown('📁 ');
+        tooltip.appendText(this.fileUri.fsPath);
+        tooltip.appendMarkdown('\n');
         tooltip.appendMarkdown(`⏰ Created: ${new Date(this.bookmark.created).toLocaleString()}`);
 
         if (this.bookmark.modified) {
