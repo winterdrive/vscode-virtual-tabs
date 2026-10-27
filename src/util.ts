@@ -65,3 +65,26 @@ export async function executeWithConfirmation(
         await action();
     }
 }
+
+/**
+ * Reveal an item in a tree view without leaking an unhandled promise rejection.
+ *
+ * TreeView.reveal() is asynchronous: when the target element is no longer in
+ * the tree (e.g. it was removed by a refresh between scheduling and running the
+ * reveal), the returned Thenable rejects. A synchronous try/catch around the
+ * call cannot observe that rejection, so it must be handled on the Thenable.
+ */
+export function revealTreeItemSafely<T>(
+    treeView: Pick<vscode.TreeView<T>, 'reveal'>,
+    item: T,
+    options?: { select?: boolean; focus?: boolean; expand?: boolean | number }
+): Promise<void> {
+    try {
+        return Promise.resolve(treeView.reveal(item, options)).then(undefined, e => {
+            console.error('Tree reveal failed:', e);
+        });
+    } catch (e) {
+        console.error('Tree reveal failed:', e);
+        return Promise.resolve();
+    }
+}
