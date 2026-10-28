@@ -301,6 +301,13 @@ export class SendToManager {
             return false;
         }
 
+        // Sending a file into the folder it already lives in would otherwise prompt
+        // to "overwrite" the file with itself, and on Windows copyFileSync then fails
+        // with EBUSY. The file is already at the destination, so treat it as done.
+        if (this.isSamePath(sourcePath, destPath)) {
+            return true;
+        }
+
         if (fs.existsSync(destPath) && confirmOverwrite) {
             const answer = await vscode.window.showWarningMessage(
                 I18n.getMessage('sendTo.confirm.overwrite', fileName, destFolder),
@@ -325,6 +332,14 @@ export class SendToManager {
             );
             return false;
         }
+    }
+
+    private static isSamePath(a: string, b: string): boolean {
+        const normalize = (p: string) => {
+            const resolved = path.resolve(p);
+            return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+        };
+        return normalize(a) === normalize(b);
     }
 
     /**
