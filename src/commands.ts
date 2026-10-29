@@ -10,6 +10,7 @@ import { SkillGenerator } from './mcp/SkillGenerator';
 import { McpConfigPanel } from './mcp/McpConfigPanel';
 import { SendToManager } from './sendTo';
 import { groupItemsByGroupIdx } from './core/GroupFileTargets';
+import { getFileExtension } from './core/FileExtension';
 
 // Global clipboard for VirtualTabs items
 let globalClipboardItems: (TempFileItem | TempFolderItem)[] = [];
@@ -1525,7 +1526,7 @@ export function registerCommands(
 
                     try {
                         const uri = vscode.Uri.parse(uriStr);
-                        const ext = uri.fsPath.split('.').pop()?.toLowerCase() || '';
+                        const ext = getFileExtension(uri.fsPath);
 
                         // Skip binary files by extension
                         if (BINARY_EXTENSIONS.has(ext)) {
@@ -1618,7 +1619,7 @@ export function registerCommands(
 
                             content += `## Bookmarks: ${labelsStr} in ${relativePath}\n`;
                             content += `> Lines: ${range.start + 1}-${range.end + 1}\n`;
-                            content += '```' + (uri.fsPath.split('.').pop() || '') + '\n';
+                            content += '```' + getFileExtension(uri.fsPath) + '\n';
                             content += chunkText + '\n';
                             content += '```\n\n';
                         }
