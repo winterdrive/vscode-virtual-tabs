@@ -10,6 +10,10 @@
  * Normalise the `files` argument, which MCP clients may send as either a
  * JSON-encoded string or a proper string array.
  *
+ * A JSON-decoded array may contain non-string entries (numbers, null, objects)
+ * that would crash downstream path handling, so only string entries are kept.
+ * A JSON-encoded single string (e.g. `"\"src/a.ts\""`) is unwrapped.
+ *
  * @param value - Raw value from the tool argument payload
  * @returns A normalised string array (may be empty)
  */
@@ -17,8 +21,11 @@ export function normalizeFilesParam(value: string[] | string | undefined): strin
   if (value === undefined) return [];
   if (typeof value === 'string') {
     try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : [value];
+      const parsed: unknown = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((entry): entry is string => typeof entry === 'string');
+      }
+      return typeof parsed === 'string' ? [parsed] : [value];
     } catch {
       return [value];
     }
