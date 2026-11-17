@@ -1226,7 +1226,7 @@ return this.configScopes.length > 1;
 
 ```bash
 # Make sure the correct @types/vscode version is installed
-npx --yes npm@12.2.2 ci --save-dev @types/vscode@^1.75.0
+npx --yes npm@12.2.2 install --save-dev @types/vscode@^1.75.0
 ```
 
 ### Q: Extension does not appear in Extension Development Host
