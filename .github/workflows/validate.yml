@@ -65,7 +65,7 @@ jobs:
           fi
 
       - name: Type check
-        run: tsc -p ./
+        run: npx --no-install tsc -p ./
 
       - name: Run Unit and Property tests with coverage
         run: npm run test:coverage
