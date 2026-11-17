@@ -36,7 +36,9 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm install --global npm@12.2.2
+          npm ci
 
       - name: Verify generated LLM context
         run: npm run docs:llms:check
@@ -63,7 +65,7 @@ jobs:
           fi
 
       - name: Type check
-        run: tsc -p ./
+        run: npx --no-install tsc -p ./
 
       - name: Run Unit and Property tests with coverage
         run: npm run test:coverage

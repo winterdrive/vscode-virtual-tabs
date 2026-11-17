@@ -8,8 +8,9 @@ This document provides a complete guide for setting up the development environme
 
 ### System Requirements
 
-* **Node.js** (Recommended v16 or above)
+* **Node.js** v24 LTS for development (the pinned npm version also supports Node >=22.22.2)
 * **VS Code** (v1.75.0 or above)
+* **npm** 12.2.2 for dependency installation (pinned in `packageManager` and CI)
 * **TypeScript** (included in devDependencies)
 
 ### Setup Steps
@@ -22,7 +23,7 @@ git clone https://github.com/winterdrive/vscode-virtual-tabs.git
 cd vscode-virtual-tabs
 
 # Install dependencies
-npm install
+npx --yes npm@12.2.2 ci
 ```
 
 #### 2. Compile TypeScript
@@ -495,7 +496,7 @@ return this.configScopes.length > 1;
 
 ```bash
 # Make sure the correct @types/vscode version is installed
-npm install --save-dev @types/vscode@^1.75.0
+npx --yes npm@12.2.2 install --save-dev @types/vscode@^1.75.0
 ```
 
 ### Q: Extension does not appear in Extension Development Host

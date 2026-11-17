@@ -64,7 +64,9 @@ jobs:
 
       - name: Install dependencies
         if: steps.check_version.outputs.changed == 'true'
-        run: npm ci
+        run: |
+          npm install --global npm@12.2.2
+          npm ci
 
       - name: Type check
         if: steps.check_version.outputs.changed == 'true'
