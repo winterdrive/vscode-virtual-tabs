@@ -129,8 +129,10 @@ export class GroupManager {
       const content = JSON.stringify(groups, null, 2);
       fs.writeFileSync(this.configPath, content, 'utf8');
 
-      // Update cache
-      this.cachedGroups = groups;
+      // Update cache with a private copy: caching the caller's array by
+      // reference would let later in-place edits (made without saving) leak
+      // into subsequent cache-hit loadGroups() results.
+      this.cachedGroups = structuredClone(groups);
       this.lastModified = fs.statSync(this.configPath).mtimeMs;
     } catch (error) {
       if (error instanceof OptimisticLockError) throw error;
