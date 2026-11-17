@@ -69,9 +69,11 @@ export class BookmarkManager {
   ): boolean {
     const bookmarkKey = BookmarkManager.findBookmarkKey(group, fileUri);
     if (!group.bookmarks || !bookmarkKey) return false;
-    const index = group.bookmarks[bookmarkKey].findIndex(b => b.id === bookmarkId);
+    const entries = group.bookmarks[bookmarkKey];
+    if (!Array.isArray(entries)) return false;
+    const index = entries.findIndex(b => b.id === bookmarkId);
     if (index === -1) return false;
-    group.bookmarks[bookmarkKey][index] = updatedBookmark;
+    entries[index] = updatedBookmark;
     return true;
   }
 
@@ -83,10 +85,12 @@ export class BookmarkManager {
   ): boolean {
     const bookmarkKey = BookmarkManager.findBookmarkKey(group, fileUri);
     if (!group.bookmarks || !bookmarkKey) return false;
-    const index = group.bookmarks[bookmarkKey].findIndex(b => b.id === bookmarkId);
+    const entries = group.bookmarks[bookmarkKey];
+    if (!Array.isArray(entries)) return false;
+    const index = entries.findIndex(b => b.id === bookmarkId);
     if (index === -1) return false;
-    group.bookmarks[bookmarkKey].splice(index, 1);
-    if (group.bookmarks[bookmarkKey].length === 0) delete group.bookmarks[bookmarkKey];
+    entries.splice(index, 1);
+    if (entries.length === 0) delete group.bookmarks[bookmarkKey];
     return true;
   }
 
@@ -94,7 +98,11 @@ export class BookmarkManager {
   static getBookmarksForFile(group: TempGroup, fileUri: string): VTBookmark[] {
     const bookmarkKey = BookmarkManager.findBookmarkKey(group, fileUri);
     if (!group.bookmarks || !bookmarkKey) return [];
-    return [...group.bookmarks[bookmarkKey]].sort((a, b) => a.line - b.line);
+    // A hand-edited config may hold a non-array value under a file key;
+    // spreading it would throw and break tree rendering for the whole group.
+    const entries = group.bookmarks[bookmarkKey];
+    if (!Array.isArray(entries)) return [];
+    return [...entries].sort((a, b) => a.line - b.line);
   }
 
   /**
@@ -138,6 +146,7 @@ export class BookmarkManager {
   ): { bookmark: VTBookmark; fileUri: string } | null {
     if (!group.bookmarks) return null;
     for (const [fileUri, bookmarks] of Object.entries(group.bookmarks)) {
+      if (!Array.isArray(bookmarks)) continue;
       const bookmark = bookmarks.find(b => b.id === bookmarkId);
       if (bookmark) return { bookmark, fileUri };
     }
@@ -147,7 +156,7 @@ export class BookmarkManager {
   /** Total bookmark count in a group */
   static getTotalBookmarkCount(group: TempGroup): number {
     if (!group.bookmarks) return 0;
-    return Object.values(group.bookmarks).reduce((t, bms) => t + bms.length, 0);
+    return Object.values(group.bookmarks).reduce((t, bms) => t + (Array.isArray(bms) ? bms.length : 0), 0);
   }
 
   /** Number of files that have bookmarks in a group */
@@ -211,6 +220,7 @@ export class BookmarkManager {
       if (!group.bookmarks) continue;
 
       for (const [fileUri, bookmarks] of Object.entries(group.bookmarks)) {
+        if (!Array.isArray(bookmarks)) continue;
         const index = bookmarks.findIndex(bm => bm.id === bookmarkId);
         if (index !== -1) {
           bookmarks.splice(index, 1);
@@ -246,6 +256,7 @@ export class BookmarkManager {
       if (!group.bookmarks) continue;
 
       for (const [fileUri, bookmarks] of Object.entries(group.bookmarks)) {
+        if (!Array.isArray(bookmarks)) continue;
         const filePath = this.fileManager.fromFileUri(fileUri);
 
         for (const bm of bookmarks) {
@@ -276,6 +287,7 @@ export class BookmarkManager {
       if (!group.bookmarks) continue;
 
       for (const [fileUri, bookmarks] of Object.entries(group.bookmarks)) {
+        if (!Array.isArray(bookmarks)) continue;
         const found = bookmarks.find(bm => bm.id === bookmarkId);
         if (found) {
           return {
