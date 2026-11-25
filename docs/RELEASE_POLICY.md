@@ -95,6 +95,10 @@ into a stable hotfix merely to fill a release batch.
 - The owner completes risk-appropriate local UI/E2E validation and a packaged
   VSIX smoke test.
 
+Exception: a stable release pull request that only promotes a validated
+pre-release, with the shipped code unchanged, needs no separate local UI/E2E
+validation or VSIX smoke test.
+
 Real VS Code UI/E2E validation is a manual pre-release gate, not a required
 remote gate for every pull request. `.github/workflows/ui-tests.yml` is only a
 diagnostic workflow and requires explicit owner authorization for each run. An
