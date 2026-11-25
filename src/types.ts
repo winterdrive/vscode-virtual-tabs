@@ -24,6 +24,14 @@ export type DateGroup =
     | 'older';
 
 /**
+ * Per-file display metadata within a group (custom label / description)
+ */
+export interface VTFileMeta {
+    label?: string;        // Display label shown in the tree instead of the file name
+    description?: string;  // Secondary text shown next to the label
+}
+
+/**
  * VirtualTabs Bookmark (v0.2.0)
  * Represents a specific code location within a file in a group
  */
@@ -89,6 +97,12 @@ export interface TempGroup {
      * Value: Array of bookmarks for that file
      */
     bookmarks?: Record<string, VTBookmark[]>;
+
+    /**
+     * Per-group display label / description for files.
+     * Key: File URI string (same keying as `bookmarks`). Absent when no file has a custom label.
+     */
+    fileMeta?: Record<string, VTFileMeta>;
 
     // Display customisation (v0.4.0)
     color?: string;                     // VS Code color theme ID (e.g. "charts.blue")

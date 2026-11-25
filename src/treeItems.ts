@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { VTBookmark, ConfigScope } from './types';
+import { VTBookmark, VTFileMeta, ConfigScope } from './types';
 
 // Temporary folder TreeItem
 export class TempFolderItem extends vscode.TreeItem {
@@ -33,7 +33,8 @@ export class TempFileItem extends vscode.TreeItem {
         public readonly groupIdx: number,
         isBuiltInGroup?: boolean,
         public readonly groupId?: string,
-        public readonly subId?: string // Extension: Added to disambiguate identical files in different editor groups
+        public readonly subId?: string, // Extension: Added to disambiguate identical files in different editor groups
+        meta?: VTFileMeta // Per-group custom label / description
     ) {
         super(uri, vscode.TreeItemCollapsibleState.None);
         this.resourceUri = uri;
@@ -53,6 +54,17 @@ export class TempFileItem extends vscode.TreeItem {
         };
         this.iconPath = vscode.ThemeIcon.File;
         this.tooltip = uri.fsPath;
+
+        // A custom label replaces the file name; the real path stays in the tooltip.
+        if (meta?.label) {
+            this.label = meta.label;
+        }
+        if (meta?.description) {
+            this.description = meta.description;
+        }
+        if (meta?.label || meta?.description) {
+            this.tooltip = [uri.fsPath, meta.description].filter(Boolean).join('\n');
+        }
 
         // Use base contextValue with capability suffix for better extensibility
         // This allows VS Code's 'when' clause to match patterns like:

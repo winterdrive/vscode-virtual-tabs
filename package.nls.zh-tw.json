@@ -37,6 +37,8 @@
     "command.addBookmark.title": "新增書籤到群組",
     "command.jumpToBookmark.title": "跳轉到書籤",
     "command.editBookmarkLabel.title": "編輯書籤標籤",
+    "command.editFileLabel.title": "編輯檔案標籤",
+    "command.editFileDescription.title": "編輯檔案描述",
     "command.editBookmarkDescription.title": "編輯書籤描述",
     "command.removeBookmark.title": "移除書籤",
     "submenu.sortFiles.label": "排序檔案",

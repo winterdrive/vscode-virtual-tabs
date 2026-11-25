@@ -10,6 +10,7 @@ import * as path from 'path';
 import { PathUtils } from './PathUtils.js';
 import { GroupManager } from './GroupManager.js';
 import { matchesStoredFileEntry } from './FileEntryMatcher.js';
+import { FileMetaManager } from './FileMetaManager.js';
 import { TempGroup } from '../types.js';
 
 /**
@@ -157,6 +158,7 @@ export class FileManager {
             }
           }
         }
+        FileMetaManager.remove(group, fileUri, targetFsPath, workspaceRoot);
       }
     }
 

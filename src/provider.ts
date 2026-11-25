@@ -6,6 +6,7 @@ import { I18n } from './i18n';
 import { FileSorter } from './core/FileSorter';
 import { AutoGrouper } from './core/AutoGrouper';
 import { BookmarkManager } from './core/BookmarkManager';
+import { FileMetaManager } from './core/FileMetaManager';
 import { GroupManager, OptimisticLockError } from './core/GroupManager';
 import { PathUtils } from './core/PathUtils';
 import { ConfigScopeDiscovery } from './core/ConfigScopeDiscovery';
@@ -676,7 +677,8 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
             return {
                 ...groupWithoutScopeId,
                 files: group.files ? group.files.map(uriStr => this.toRelativePath(uriStr, root)) : group.files,
-                bookmarks: group.bookmarks ? this.toRelativeBookmarks(group.bookmarks, root) : group.bookmarks
+                bookmarks: group.bookmarks ? this.toRelativeBookmarks(group.bookmarks, root) : group.bookmarks,
+                ...(group.fileMeta ? { fileMeta: FileMetaManager.mapKeys(group.fileMeta, key => this.toRelativePath(key, root)) } : {})
             };
         });
     }
@@ -710,7 +712,8 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
             return {
                 ...group,
                 files,
-                bookmarks: group.bookmarks ? this.fromStorageBookmarks(group.bookmarks, root) : group.bookmarks
+                bookmarks: group.bookmarks ? this.fromStorageBookmarks(group.bookmarks, root) : group.bookmarks,
+                ...(group.fileMeta ? { fileMeta: FileMetaManager.mapKeys(group.fileMeta, key => this.toAbsoluteUri(key, root)) } : {})
             };
         });
     }
@@ -1572,6 +1575,7 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
                 sourceScopeId: group.sourceScopeId
             };
             AutoGrouper.moveBookmarks(group, newGroup, files);
+            FileMetaManager.move(group, newGroup, files);
             return newGroup;
         });
 
@@ -1644,6 +1648,7 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
                     sourceScopeId: group.sourceScopeId
                 };
                 AutoGrouper.moveBookmarks(group, newGroup, files);
+                FileMetaManager.move(group, newGroup, files);
                 newGroups.push(newGroup);
             }
         }
@@ -1664,7 +1669,7 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
         if (element instanceof BookmarkItem) {
             // Return corresponding TempFileItem
             const group = this.groups[element.groupIdx];
-            return new TempFileItem(element.fileUri, element.groupIdx, group?.builtIn, group?.id);
+            return new TempFileItem(element.fileUri, element.groupIdx, group?.builtIn, group?.id, undefined, group && FileMetaManager.get(group, element.fileUri.toString()));
         }
         if (element instanceof EditorGroupItem) {
             // Return the built-in TempFolderItem
@@ -1962,7 +1967,7 @@ export class TempFoldersProvider implements vscode.TreeDataProvider<vscode.TreeI
 
                 const fileItems = sortedFiles.map(uriStr => {
                     const uri = vscode.Uri.parse(uriStr);
-                    const fileItem = new TempFileItem(uri, element.groupIdx, group.builtIn, group.id);
+                    const fileItem = new TempFileItem(uri, element.groupIdx, group.builtIn, group.id, undefined, FileMetaManager.get(group, uriStr));
 
                     // Cache the rendered item so reveal() can use the same instance
                     if (group.builtIn && fileItem.id) {

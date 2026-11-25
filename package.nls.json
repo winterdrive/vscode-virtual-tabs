@@ -37,6 +37,8 @@
     "command.addBookmark.title": "Add Bookmark to Group",
     "command.jumpToBookmark.title": "Jump to Bookmark",
     "command.editBookmarkLabel.title": "Edit Bookmark Label",
+    "command.editFileLabel.title": "Edit File Label",
+    "command.editFileDescription.title": "Edit File Description",
     "command.editBookmarkDescription.title": "Edit Bookmark Description",
     "command.removeBookmark.title": "Remove Bookmark",
     "submenu.sortFiles.label": "Sort Files",

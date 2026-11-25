@@ -4,6 +4,7 @@ import { TempFolderItem, TempFileItem, ScopeHeaderItem, EditorGroupItem } from '
 import { I18n } from './i18n';
 import { extractDataTransferFileUris, formatDraggedFilesPlainText, parseUriList, uniqueUriStrings } from './core/DropUriParser';
 import { BookmarkManager } from './core/BookmarkManager';
+import { FileMetaManager } from './core/FileMetaManager';
 import { removeStoredFileEntriesFromGroup } from './core/GroupFileRemoval';
 
 // Drag-and-drop controller, allows files to be dragged into groups AND groups to be nested
@@ -292,6 +293,9 @@ export class TempFoldersDragAndDropController implements vscode.TreeDragAndDropC
                     delete sourceGroup.bookmarks;
                 }
             }
+
+            // 1b. Move custom label / description
+            FileMetaManager.move(sourceGroup, targetGroup, [fileUri]);
 
             // 2. Move File
             // Remove from source group. Compare via the shared fsPath-based matcher,
