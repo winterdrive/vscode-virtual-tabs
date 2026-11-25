@@ -77,10 +77,6 @@ async function getRowTexts(): Promise<string[]> {
     `) as string[];
 }
 
-async function waitForRows(predicate: (rows: string[]) => boolean, message: string, timeoutMs = 15_000): Promise<void> {
-    await VSBrowser.instance.driver.wait(async () => predicate(await getRowTexts()), timeoutMs, message);
-}
-
 async function openVirtualTabsView(): Promise<SideBarView> {
     await dismissOnboardingOverlay();
     const viewControl = (await new ActivityBar().getViewControl('Virtual Tabs')) as ViewControl;
@@ -127,19 +123,61 @@ async function dismissContextViews(): Promise<void> {
     await driver.sleep(200);
 }
 
-/** First tree row whose text contains `text`. */
+/**
+ * Texts of the tree rows nested under the group row `GROUP_NAME`, down to the next row that is not nested in it.
+ *
+ * Every row lookup in this suite goes through the group. A file that is open in an editor is also listed under
+ * the built-in "Currently Open Files" group, which comes first in the tree and shows the real file name (labels
+ * are not applied there), so counting or picking rows tree-wide depends on what earlier tests left open.
+ */
+async function rowsUnderGroup(): Promise<string[]> {
+    return await VSBrowser.instance.driver.executeScript(`
+        const rows = Array.from(document.querySelectorAll('.monaco-list-row'));
+        const text = r => (r.textContent || '').replace(/\\s+/g, ' ').trim();
+        const out = [];
+        let level = null;
+        for (const r of rows) {
+            const rowLevel = Number(r.getAttribute('aria-level'));
+            if (level === null) {
+                if (text(r) === arguments[0]) { level = rowLevel; }
+                continue;
+            }
+            if (!(rowLevel > level)) { break; }
+            out.push(text(r));
+        }
+        return out;
+    `, GROUP_NAME) as string[];
+}
+
+async function waitForRowsUnderGroup(predicate: (rows: string[]) => boolean, message: string, timeoutMs = 15_000): Promise<void> {
+    await VSBrowser.instance.driver.wait(async () => predicate(await rowsUnderGroup()), timeoutMs, message);
+}
+
+/** First row under the group `GROUP_NAME` whose text contains `text`. */
 async function findRow(text: string): Promise<WebElement> {
     const driver = VSBrowser.instance.driver;
     return await driver.wait(async () => {
+        let level: number | null = null;
         for (const row of await driver.findElements(By.css('.monaco-list-row'))) {
             try {
-                if ((await row.getText()).includes(text)) {
+                const rowText = (await row.getText()).replace(/\s+/g, ' ').trim();
+                const rowLevel = Number(await row.getAttribute('aria-level'));
+                if (level === null) {
+                    if (rowText === GROUP_NAME) {
+                        level = rowLevel;
+                    }
+                    continue;
+                }
+                if (!(rowLevel > level)) {
+                    return null;
+                }
+                if (rowText.includes(text)) {
                     return row;
                 }
             } catch { /* stale row, retry */ }
         }
         return null;
-    }, 10_000, `Tree row containing "${text}" not found`) as WebElement;
+    }, 10_000, `Row containing "${text}" not found under group "${GROUP_NAME}"`) as WebElement;
 }
 
 /** Select the row, right-click it, and run a context-menu action by its exact title. */
@@ -211,7 +249,7 @@ describe('Virtual Tabs - Custom file label (issue #163)', function () {
     });
 
     it('shows both same-named files as "index.ts" before any label is set', async function () {
-        await waitForRows(
+        await waitForRowsUnderGroup(
             rows => rows.filter(text => text === 'index.ts').length === 2,
             'Expected two rows labelled "index.ts"'
         );
@@ -221,7 +259,7 @@ describe('Virtual Tabs - Custom file label (issue #163)', function () {
         await runContextAction('index.ts', 'Edit File Label');
         await submitInput('pkg-a index');
 
-        await waitForRows(
+        await waitForRowsUnderGroup(
             rows => rows.includes('pkg-a index') && rows.filter(text => text === 'index.ts').length === 1,
             'Labelled file should show "pkg-a index" while the other keeps "index.ts"'
         );
@@ -232,14 +270,14 @@ describe('Virtual Tabs - Custom file label (issue #163)', function () {
 
     it('the label survives a reload from disk', async function () {
         await clickRefresh(sidebar);
-        await waitForRows(rows => rows.includes('pkg-a index'), 'Label disappeared after refresh');
+        await waitForRowsUnderGroup(rows => rows.includes('pkg-a index'), 'Label disappeared after refresh');
     });
 
     it('a description is shown next to the label and persisted', async function () {
         await runContextAction('pkg-a index', 'Edit File Description');
         await submitInput('entry point');
 
-        await waitForRows(
+        await waitForRowsUnderGroup(
             rows => rows.some(text => text.includes('pkg-a index') && text.includes('entry point')),
             'Description should appear next to the label'
         );
@@ -248,37 +286,27 @@ describe('Virtual Tabs - Custom file label (issue #163)', function () {
         expect(readFileAMeta()?.label).to.equal('pkg-a index');
     });
 
-    it('the hover tooltip keeps the real file path and includes the description', async function () {
-        const driver = VSBrowser.instance.driver;
-        await dismissContextViews();
-        const row = await findRow('pkg-a index');
-        // Move away first so the hover is re-triggered even if the pointer was already on the row.
-        await driver.actions().move({ x: 5, y: 5 }).perform();
-        await driver.actions().move({ origin: row }).perform();
+    it('the tooltip keeps the real file path and includes the description', async function () {
+        // VS Code hands a tree item's tooltip to the row as its accessible name (aria-label): the real
+        // path, then the description. Reading it is deterministic. Opening the visual hover with a pointer
+        // move is not: it stopped opening reliably between extest versions (8.23 worked, 8.28 does not).
+        const labelled = await findRow('pkg-a index');
+        const labelledTooltip = ((await labelled.getAttribute('aria-label')) ?? '').replace(/\\/g, '/');
+        expect(labelledTooltip).to.include('file-label-pkg-a/index.ts');
+        expect(labelledTooltip).to.include('entry point');
 
-        let hoverText = '';
-        await driver.wait(async () => {
-            const hovers = await driver.findElements(By.css('.monaco-hover'));
-            for (const hover of hovers) {
-                try {
-                    const text = (await hover.getText()).replace(/\\/g, '/');
-                    if (text.includes('file-label-pkg-a/index.ts')) {
-                        hoverText = text;
-                        return true;
-                    }
-                } catch { /* stale hover, retry */ }
-            }
-            return false;
-        }, 15_000, 'Tooltip with the real file path did not appear');
-        expect(hoverText).to.include('entry point');
-        await driver.actions().move({ x: 5, y: 5 }).perform();
+        // Control: the other file has no label or description, so its tooltip is just its own real path.
+        const plain = await findRow('index.ts');
+        const plainTooltip = ((await plain.getAttribute('aria-label')) ?? '').replace(/\\/g, '/');
+        expect(plainTooltip).to.include('file-label-pkg-b/index.ts');
+        expect(plainTooltip).to.not.include('entry point');
     });
 
     it('a blank label restores the file name and keeps the description', async function () {
         await runContextAction('pkg-a index', 'Edit File Label');
         await submitInput('');
 
-        await waitForRows(
+        await waitForRowsUnderGroup(
             rows => !rows.some(text => text.includes('pkg-a index')) &&
                 rows.some(text => text.startsWith('index.ts') && text.includes('entry point')),
             'Blank label should restore "index.ts" and keep the description'
@@ -293,7 +321,7 @@ describe('Virtual Tabs - Custom file label (issue #163)', function () {
         await runContextAction('entry point', 'Edit File Description');
         await submitInput('');
 
-        await waitForRows(
+        await waitForRowsUnderGroup(
             rows => rows.filter(text => text === 'index.ts').length === 2,
             'Both files should show "index.ts" again'
         );
