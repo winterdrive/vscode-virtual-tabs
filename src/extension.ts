@@ -5,6 +5,7 @@ import { registerCommands } from './commands';
 import { I18n } from './i18n';
 import { TempFolderItem, TempFileItem, ScopeHeaderItem } from './treeItems';
 import { ConfigScope } from './types';
+import { revealTreeItemSafely } from './util';
 
 
 /**
@@ -220,13 +221,9 @@ export async function activate(context: vscode.ExtensionContext) {
                 const itemToReveal = provider.findInternalFileItem(activeUri, editor.viewColumn);
 
                 if (itemToReveal) {
-                    try {
-                        // Non-Expanding Sync: expand: false ensures we don't force open collapsed groups.
-                        // It only highlights if the target folder is already expanded by the user.
-                        treeView.reveal(itemToReveal, { select: true, focus: false, expand: false });
-                    } catch (e) {
-                        console.error('Tree reveal failed:', e);
-                    }
+                    // Non-Expanding Sync: expand: false ensures we don't force open collapsed groups.
+                    // It only highlights if the target folder is already expanded by the user.
+                    void revealTreeItemSafely(treeView, itemToReveal, { select: true, focus: false, expand: false });
                 }
             }, 100);
         })
