@@ -1486,8 +1486,8 @@ Source: [Testing](https://raw.githubusercontent.com/winterdrive/vscode-virtual-t
 [繁體中文](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/TESTING.zh-TW.md) | English
 
 This is the current, maintained reference for this repo's **automated** test
-suites (v0.16.0 stable release). The current root baseline is **42 suites /
-263 tests** (38 unit suites and 4 property suites). If you find older local notes describing manual test
+suites (v0.17.0 pre-release train). The current root baseline is **53 suites /
+307 tests** (49 unit suites and 4 property suites). If you find older local notes describing manual test
 checklists for specific past issues, they don't describe the actual current
 suite — don't use them to judge current behavior or coverage.
 
@@ -2148,6 +2148,22 @@ Source: [Release history](https://raw.githubusercontent.com/winterdrive/vscode-v
 # Change Log
 
 All notable changes to the "VirtualTabs" extension will be documented in this file.
+
+## [0.17.0] - Dependency Remediation & Input Hardening (pre-release) - 2026-11-26
+
+- **fix(deps):** the bundled MCP server no longer ships known vulnerable dependencies: the `@modelcontextprotocol/sdk` and `zod` ranges are raised to patched versions and both lockfiles are refreshed. `npm audit` reports 0 findings for the root and `mcp-server`, down from 9 production findings in `mcp-server`. Deferred from `0.16.0` so it goes through a pre-release first ([#170](https://github.com/winterdrive/vscode-virtual-tabs/pull/170), deferred by [#174](https://github.com/winterdrive/vscode-virtual-tabs/pull/174), re-applied by [#176](https://github.com/winterdrive/vscode-virtual-tabs/pull/176)).
+- **fix(commands):** Copy Context for AI no longer writes the whole file path as the code-fence language for files without an extension (`Makefile`, `Dockerfile`, `LICENSE`) or inside dotted folders. The language now comes from the extension, in lowercase, and dot-files such as `.gitignore` get none ([#168](https://github.com/winterdrive/vscode-virtual-tabs/pull/168)).
+- **fix(treeItems):** bookmark tooltips show labels, descriptions and file paths literally. A Windows path such as `C:\proj\.vscode` no longer loses its backslash, and `*` or `_` in a label no longer garbles the text ([#165](https://github.com/winterdrive/vscode-virtual-tabs/pull/165)).
+- **fix(AutoGrouper):** grouping by modified date no longer puts yesterday's file under "today", or an 8-day-old file under "this week", around a daylight-saving change; the MCP `groupByDate` tool shares the fix ([#160](https://github.com/winterdrive/vscode-virtual-tabs/pull/160)).
+- **fix(provider):** deleting a group no longer overflows the stack when the stored `parentGroupId` links form a cycle ([#157](https://github.com/winterdrive/vscode-virtual-tabs/pull/157)).
+- **fix(bookmarks):** a bookmark entry that is not an array (a hand-edited or corrupted config) no longer breaks the tree or the MCP `list_bookmarks` and `delete_bookmark` tools; the stored value is left untouched ([#158](https://github.com/winterdrive/vscode-virtual-tabs/pull/158)).
+- **fix(pathUtils):** `validatePath` rejects only real `..` segments, so names such as `..config/x` are accepted over MCP and in the project explorer; absolute paths, `..` and `../x` are still rejected ([#159](https://github.com/winterdrive/vscode-virtual-tabs/pull/159)).
+- **fix(FileManager):** adding files over MCP rejects an empty path, `.` and the workspace root instead of storing the root folder as an unopenable file ([#164](https://github.com/winterdrive/vscode-virtual-tabs/pull/164)).
+- **fix(mcp):** the `files` argument keeps only string entries and unwraps a JSON-encoded single path, instead of failing with an internal error ([#169](https://github.com/winterdrive/vscode-virtual-tabs/pull/169)).
+- **fix(ProjectExplorer):** `read_file` no longer reports a file that shrank while being read as a binary file ([#161](https://github.com/winterdrive/vscode-virtual-tabs/pull/161)).
+- **fix(extension):** an async failure of the automatic `TreeView.reveal()` is handled and logged instead of going unhandled ([#166](https://github.com/winterdrive/vscode-virtual-tabs/pull/166)).
+- **fix(sendTo):** sending a file into the folder it is already in counts as done, without an overwrite prompt or a copy onto itself ([#167](https://github.com/winterdrive/vscode-virtual-tabs/pull/167)).
+- **test(ui):** real UI/E2E coverage for drag-and-drop between groups, right-click Delete File and the MCP configuration webview, with a `test:ui:mcpconfig` script ([#172](https://github.com/winterdrive/vscode-virtual-tabs/pull/172)). Tests and docs only; nothing ships.
 
 ## [0.16.0] - Stable Release: MCP Input Hardening & Cycle Safety - 2026-11-26
 
