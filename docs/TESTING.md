@@ -21,12 +21,13 @@ If you add, rename, or remove a test file, update this doc in the same PR.
 | Main UI/E2E suite | `npm run test:ui` | Compiles UI tests (`tsconfig.test.ui.json`) then `extest setup-and-run` against `out/test/ui/**/*.test.js`, opening `test-resources/multi-root/virtual-tabs.code-workspace`, pinned to VS Code `1.96.0` |
 | Demo recording | `npm run test:ui:demo` | Runs **only** `out/test/ui/demo/groupOrganize.demo.js` against `test-resources/demo-workspace`, and writes generated VS Code settings + a `test-results/demo-vscode-settings.generated.json` output file first — see "Demo script" below, this is not a regression test |
 | Self-root E2E suite | `npm run test:ui:selfroot` | Runs **only** `out/test/ui/selfRoot/**/*.selfroot.js` against a dedicated `test-resources/self-root/project.code-workspace` fixture — kept separate from `test:ui` because it needs a *self-root* workspace (`"folders": [{ "path": "." }]`), which is structurally incompatible with the shared multi-root fixture every other UI test opens |
+| MCP config webview E2E suite | `npm run test:ui:mcpconfig` | Runs **only** `out/test/ui/mcpConfig/**/*.mcpconfig.js` against a dedicated `test-resources/mcp-config/hostile-names.code-workspace` fixture whose workspace folder names are hostile strings (`<b>x</b>`, a name that tries to close the page's `<script>` block) — kept separate from `test:ui` because it needs its own workspace, for the same reason as the self-root suite; pinned to VS Code `1.96.0` |
 
 **UI tests require a real, visible VS Code window and take several minutes.**
 They should be run by a human on their own machine, not by an AI agent in a
 sandboxed environment.
 
-None of the three `test:ui*` run scripts pass a project-local `-s`/`--storage`
+None of the four `test:ui*` run scripts pass a project-local `-s`/`--storage`
 override to `extest`. This is deliberate: `vscode-extension-tester` caches its
 downloaded VS Code + ChromeDriver binaries under `%TEMP%/test-resources` by
 default, and every sibling `vscode-extension-tester`-based project on this
@@ -128,6 +129,8 @@ scrolls.
 | `addBookmarkNoDuplicate.ui.test.ts` | Adding a bookmark on Windows doesn't create a second file tree entry when the stored file URI's drive-letter casing differs from the URI VS Code hands back at bookmark time |
 | `removeSelectedFilesFromGroup.ui.test.ts` | Removing selected files from a group correctly operates on reloaded (workspace-relative-path) groups, including when two separate groups both contain relative-path entries, without cross-group leakage |
 | `autoGroupBookmarksAndBuiltIn.ui.test.ts` | Two v0.7.8 regressions found via manual testing, reproduced end-to-end: (1) **#96** — Auto Group by Extension previously moved only the file, not its bookmark, because the fix in #81 only touched the MCP-tool layer (`core/AutoGrouper.ts`), never the real tree-view command path in `provider.ts`; (2) **#99** — auto sub-groups created from the built-in group were invisible under an active scope filter and, once visible, were being silently persisted into whichever real scope's config happened to be first. Deliberately written as real end-to-end tests because the unit tests added alongside #96/#99 use a hand-built provider harness with a mocked `vscode` module — exactly the kind of gap that let both bugs ship in the first place |
+| `dragAndDrop.ui.test.ts` | Real pointer drag-and-drop in the tree (W3C actions, so VS Code's own tree DnD runs and the extension receives a genuine `DataTransfer`): a file dragged from group A to group B — a project file and, on Windows, a file on another drive (**#154**) — ends up only in B; and dragging a group into its own child or onto itself shows the "circular nesting" / "cannot nest a group into itself" error and changes nothing. Includes a positive control (an unrelated group nests fine) so "nothing changed" can't mean "the drag did nothing" |
+| `deleteFile.ui.test.ts` | Right-click **Delete File**: the real context menu and the real modal confirmation. Cancel keeps the file on disk and in the group; **Move to Trash** deletes a project file and, on Windows, a real file on another drive from disk and removes it from the group. Group rows are looked up *inside* the group, because a file open in an editor is also listed under "Currently Open Files". **Side effects:** the test creates real files (one under `Repo-A`, and on Windows one in `D:\vt-ui-delete-test`, removed afterwards) and the files it deletes stay in the OS Recycle Bin / Trash |
 
 ### `src/test/ui/selfRoot/` — dedicated self-root E2E suite
 
@@ -150,6 +153,25 @@ fixture, `test-resources/self-root/project.code-workspace`, precisely
 multi-root fixture — hence its own `test:ui:selfroot` script and its own
 `tsconfig.test.ui.json`-compiled `out/test/ui/selfRoot/**/*.selfroot.js`
 glob, run in complete isolation from the rest of `test:ui`.
+
+### `src/test/ui/mcpConfig/` — dedicated MCP config webview E2E suite
+
+`mcpConfigEscape.mcpconfig.ts` covers **#146** end to end: workspace folder
+names can come from an untrusted `.code-workspace` file, so the MCP config
+webview (`VirtualTabs: Show MCP Config`) must render them as text. It opens a
+real VS Code window on `test-resources/mcp-config/hostile-names.code-workspace`
+(folder names `<b>x</b>` and a string that tries to close the page's own
+`<script>` block and inject an `<img onerror>`), opens the real webview, and
+inspects its DOM: both names appear as plain text in the selector, no `<b>`
+element or `<img>` is created, the injected handler never runs, and the page
+script still renders and still works after switching to the hostile folder.
+The unit test (`mcpConfigPanelEscapeHtml.test.ts`) only covers `escapeHtml`
+itself; this suite covers the whole generated page, including the JSON the
+page embeds in its `<script>` block.
+
+Like the self-root suite it needs its own workspace, so it uses the
+`.mcpconfig.ts` naming convention, its own `test:ui:mcpconfig` script and the
+`out/test/ui/mcpConfig/**/*.mcpconfig.js` glob, outside the main `test:ui` run.
 
 ### `src/test/ui/demo/` — not a test suite
 
@@ -174,7 +196,7 @@ regression signal, and do not add real coverage assertions to it.
   oversight — see "Running the tests" above. Don't add a `-s`/`--storage`
   flag to any `test:ui*` script without understanding you'd be opting this
   repo out of that sharing with PromptManager/Edo-Tensei.
-- **`test:ui`, `test:ui:demo`, and `test:ui:selfroot` are pinned to VS Code
+- **`test:ui`, `test:ui:demo`, `test:ui:selfroot`, and `test:ui:mcpconfig` are pinned to VS Code
   `1.96.0`** via `extest`'s `-c` flag — independent of this extension's own
   `engines.vscode` compatibility floor (`^1.75.0`), which is what actually
   ships to users.
