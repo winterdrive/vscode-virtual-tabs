@@ -19,11 +19,12 @@
 | 主要 UI/E2E 套件 | `npm run test:ui` | 先以 `tsconfig.test.ui.json` 編譯 UI 測試，再對 `out/test/ui/**/*.test.js` 執行 `extest setup-and-run`，開啟 `test-resources/multi-root/virtual-tabs.code-workspace`，並固定使用 VS Code `1.96.0` |
 | 展示錄製 | `npm run test:ui:demo` | **僅**針對 `test-resources/demo-workspace` 執行 `out/test/ui/demo/groupOrganize.demo.js`，並會先寫入產生的 VS Code 設定，以及一份 `test-results/demo-vscode-settings.generated.json` 輸出檔案 —— 詳見下方「Demo script」，這**不是**回歸測試 |
 | Self-root E2E 套件 | `npm run test:ui:selfroot` | **僅**針對專屬的 `test-resources/self-root/project.code-workspace` 夾具執行 `out/test/ui/selfRoot/**/*.selfroot.js` —— 之所以與 `test:ui` 分開，是因為它需要一個 *self-root* 工作區（`"folders": [{ "path": "." }]`），這在結構上與其他所有 UI 測試共用開啟的 multi-root 夾具不相容 |
+| MCP 設定頁 webview E2E 套件 | `npm run test:ui:mcpconfig` | **僅**針對專屬的 `test-resources/mcp-config/hostile-names.code-workspace` 夾具執行 `out/test/ui/mcpConfig/**/*.mcpconfig.js` —— 該夾具的工作區資料夾名稱是惡意字串（`<b>x</b>`，以及一個試圖關閉頁面 `<script>` 區塊的名稱）。之所以與 `test:ui` 分開，是因為它需要自己的工作區，原因與 self-root 套件相同；並固定使用 VS Code `1.96.0` |
 
 **UI 測試需要一個真實、可見的 VS Code 視窗，且需要數分鐘才能跑完。**
 應由人類在自己的機器上執行，而非在沙盒環境中的 AI 代理執行。
 
-三個 `test:ui*` 執行腳本都**沒有**對 `extest` 傳入專案本地的 `-s`/`--storage`
+四個 `test:ui*` 執行腳本都**沒有**對 `extest` 傳入專案本地的 `-s`/`--storage`
 覆寫參數。這是刻意的設計：`vscode-extension-tester` 預設會將下載的 VS Code +
 ChromeDriver 二進位檔快取在 `%TEMP%/test-resources` 底下，讓這台機器上每個
 基於 `vscode-extension-tester` 的姊妹專案（PromptManager、Edo-Tensei、
@@ -122,6 +123,8 @@ editorGrouper/VirtualTabs 本身）共用同一份快取，而不必各自下載
 | `addBookmarkNoDuplicate.ui.test.ts` | 在 Windows 上新增書籤時，即使儲存的檔案 URI 磁碟機代號大小寫與 VS Code 在建立書籤當下回傳的 URI 不同，也不會產生第二個重複的檔案樹項目 |
 | `removeSelectedFilesFromGroup.ui.test.ts` | 從群組中移除選取的檔案時，能正確處理重新載入後（以工作區相對路徑儲存）的群組，包括兩個獨立群組都含有相對路徑項目的情況，且不會有跨群組的洩漏 |
 | `autoGroupBookmarksAndBuiltIn.ui.test.ts` | 透過手動測試發現的兩個 v0.7.8 回歸問題，以端對端方式重現：（1）**#96** —— 依副檔名自動分組（Auto Group by Extension）過去只會移動檔案，不會移動其書籤，原因是 #81 的修正只動到了 MCP 工具層（`core/AutoGrouper.ts`），從未觸及 `provider.ts` 中真實的樹狀檢視命令路徑；（2）**#99** —— 從內建群組建立的自動子群組，在啟用範圍篩選時會變得不可見，一旦可見後，又會被悄悄持久化到剛好排在第一位的某個真實範圍設定中。之所以刻意撰寫成真正的端對端測試，是因為 #96/#99 當時一併加入的單元測試使用的是手動建構、搭配模擬 `vscode` 模組的 provider 測試工具——而這正是當初讓這兩個錯誤得以上線的那種漏洞類型 |
+| `dragAndDrop.ui.test.ts` | 在樹狀檢視中以真實指標拖放（W3C actions，因此會執行 VS Code 自己的樹狀拖放機制，擴充套件收到的是真正的 `DataTransfer`）：把檔案從群組 A 拖到群組 B——專案內檔案，以及在 Windows 上位於另一個磁碟的檔案（**#154**）——只會出現在 B；把群組拖進它自己的子群組或拖到自己身上，會顯示「circular nesting」／「cannot nest a group into itself」錯誤，且不會改變任何東西。內含正向對照組（不相關的群組可以正常巢狀），所以「沒有變動」不可能是「拖放根本沒發生」 |
+| `deleteFile.ui.test.ts` | 右鍵 **Delete File**：真實的右鍵選單與真實的模態確認對話框。Cancel 會讓檔案留在磁碟與群組中；**Move to Trash** 會把專案內檔案，以及在 Windows 上位於另一個磁碟的真實檔案從磁碟刪除並從群組移除。群組內的列是在該群組*底下*查找，因為開啟在編輯器中的檔案也會列在「Currently Open Files」群組下。**副作用：** 測試會建立真實檔案（`Repo-A` 底下一個，Windows 上另在 `D:\vt-ui-delete-test` 一個，結束後移除），而被刪除的檔案會留在作業系統的資源回收筒／垃圾桶 |
 
 ### `src/test/ui/selfRoot/` —— 專屬的 self-root E2E 套件
 
@@ -142,6 +145,25 @@ self-root 工作區的真實 VS Code 執行個體中，啟動真正打包後的�
 `test:ui:selfroot` 腳本，以及由 `tsconfig.test.ui.json` 編譯出的專屬
 `out/test/ui/selfRoot/**/*.selfroot.js` glob 樣式，與 `test:ui` 的其餘
 部分完全隔離執行。
+
+### `src/test/ui/mcpConfig/` —— 專屬的 MCP 設定頁 webview E2E 套件
+
+`mcpConfigEscape.mcpconfig.ts` 以端對端方式涵蓋 **#146**：工作區資料夾名稱
+可能來自不受信任的 `.code-workspace` 檔案，因此 MCP 設定頁 webview
+（`VirtualTabs: Show MCP Config`）必須把它們當成純文字渲染。這個測試會在
+真實的 VS Code 視窗中開啟
+`test-resources/mcp-config/hostile-names.code-workspace`（資料夾名稱為
+`<b>x</b>`，以及一個試圖關閉頁面自己的 `<script>` 區塊並注入
+`<img onerror>` 的字串），開啟真實的 webview 並檢查它的 DOM：兩個名稱都以
+純文字出現在選單中、沒有產生任何 `<b>` 元素或 `<img>`、注入的處理函式
+從未執行，而且切換到惡意名稱的資料夾後，頁面腳本仍會正常渲染並運作。
+單元測試（`mcpConfigPanelEscapeHtml.test.ts`）只涵蓋 `escapeHtml` 本身；
+這個套件涵蓋整個產生出來的頁面，包括頁面嵌入在 `<script>` 區塊中的 JSON。
+
+與 self-root 套件一樣，它需要自己的工作區，所以採用 `.mcpconfig.ts` 命名
+慣例、專屬的 `test:ui:mcpconfig` 腳本，以及
+`out/test/ui/mcpConfig/**/*.mcpconfig.js` glob 樣式，不屬於主要 `test:ui`
+的執行範圍。
 
 ### `src/test/ui/demo/` —— 並非測試套件
 
@@ -164,7 +186,7 @@ AI 上下文」的流程，並帶有可見的點擊漣漪提示，最後產生
   詳見上方「執行測試」。在為任何 `test:ui*` 腳本加上 `-s`/`--storage`
   參數之前，請先確認自己清楚這麼做會讓本儲存庫退出與
   PromptManager/Edo-Tensei 共用快取的機制。
-- **`test:ui`、`test:ui:demo` 與 `test:ui:selfroot` 都透過 `extest` 的
+- **`test:ui`、`test:ui:demo`、`test:ui:selfroot` 與 `test:ui:mcpconfig` 都透過 `extest` 的
   `-c` 參數固定使用 VS Code `1.96.0`**——這與本擴充套件自身的
   `engines.vscode` 相容性下限（`^1.75.0`）無關，後者才是實際出貨給
   使用者的版本。

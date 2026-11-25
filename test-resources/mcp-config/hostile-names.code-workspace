@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "name": "<b>x</b>",
+      "path": "Folder-A"
+    },
+    {
+      "name": "</script><img src=x onerror=\"window.__vtXss=1\"><script>",
+      "path": "Folder-B"
+    }
+  ],
+  "settings": {
+    "workbench.startupEditor": "none"
+  }
+}
