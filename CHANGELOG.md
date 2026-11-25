@@ -2,6 +2,11 @@
 
 All notable changes to the "VirtualTabs" extension will be documented in this file.
 
+## [0.16.0] - Stable Release: MCP Input Hardening & Cycle Safety - 2026-11-26
+
+- **Stable Promotion:** promotes the `0.15.0` pre-release batch to the stable channel, including #145, #146, #147, #148, #154, and #132. See the `0.15.0` entry below for the individual fixes.
+- **ci:** the tooling half of [#170](https://github.com/winterdrive/vscode-virtual-tabs/pull/170): CI installs the pinned npm 12.2.2 and runs the type check through `npx --no-install tsc`, and `packageManager` records the npm version. Nothing in it ships. The dependency changes of #170 (MCP SDK and zod ranges, lockfiles, overrides) are deliberately **not** in this release; they go through the `0.17.0` pre-release first, as `docs/RELEASE_POLICY.md` requires for unproven changes.
+
 ## [0.15.0] - MCP Input Hardening & Cycle Safety (pre-release) - 2026-09-20
 
 - **fix(dragAndDrop):** stop a cross-group file drag from duplicating the file — the source-group removal compared a raw string against `vscode.Uri`'s percent-encoded `toString()` output, which never matched a stored entry whose colon (e.g. a Windows drive letter) wasn't encoded, so the removal silently no-op'd while the file was still added to the target group; the single-file `deleteFile` command had the same bug, where it could silently fail to remove the file at all ([#154](https://github.com/winterdrive/vscode-virtual-tabs/pull/154), fixes [#153](https://github.com/winterdrive/vscode-virtual-tabs/issues/153)).

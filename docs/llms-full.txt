@@ -1486,8 +1486,8 @@ Source: [Testing](https://raw.githubusercontent.com/winterdrive/vscode-virtual-t
 [繁體中文](https://raw.githubusercontent.com/winterdrive/vscode-virtual-tabs/main/docs/TESTING.zh-TW.md) | English
 
 This is the current, maintained reference for this repo's **automated** test
-suites (v0.15.0 pre-release train). The current root baseline is **41 suites /
-261 tests** (37 unit suites and 4 property suites). If you find older local notes describing manual test
+suites (v0.16.0 stable release). The current root baseline is **42 suites /
+263 tests** (38 unit suites and 4 property suites). If you find older local notes describing manual test
 checklists for specific past issues, they don't describe the actual current
 suite — don't use them to judge current behavior or coverage.
 
@@ -2126,6 +2126,11 @@ Source: [Release history](https://raw.githubusercontent.com/winterdrive/vscode-v
 # Change Log
 
 All notable changes to the "VirtualTabs" extension will be documented in this file.
+
+## [0.16.0] - Stable Release: MCP Input Hardening & Cycle Safety - 2026-11-26
+
+- **Stable Promotion:** promotes the `0.15.0` pre-release batch to the stable channel, including #145, #146, #147, #148, #154, and #132. See the `0.15.0` entry below for the individual fixes.
+- **ci:** the tooling half of [#170](https://github.com/winterdrive/vscode-virtual-tabs/pull/170): CI installs the pinned npm 12.2.2 and runs the type check through `npx --no-install tsc`, and `packageManager` records the npm version. Nothing in it ships. The dependency changes of #170 (MCP SDK and zod ranges, lockfiles, overrides) are deliberately **not** in this release; they go through the `0.17.0` pre-release first, as `docs/RELEASE_POLICY.md` requires for unproven changes.
 
 ## [0.15.0] - MCP Input Hardening & Cycle Safety (pre-release) - 2026-09-20
 
