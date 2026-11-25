@@ -696,7 +696,7 @@
         "build:skills": "node -e \"const fs=require('fs');fs.mkdirSync('dist/skills/virtualtabs',{recursive:true});fs.copyFileSync('skills/virtualtabs/SKILL.md','dist/skills/virtualtabs/SKILL.md');fs.mkdirSync('skills/virtualtabs/scripts',{recursive:true});fs.copyFileSync('dist/vt.bundle.js','skills/virtualtabs/scripts/vt.bundle.js')\""
     },
     "devDependencies": {
-        "@modelcontextprotocol/sdk": "^1.32.0",
+        "@modelcontextprotocol/sdk": "^1.30.0",
         "@types/chai": "^4.3.20",
         "@types/jest": "^30.0.0",
         "@types/mocha": "^10.0.10",
@@ -711,17 +711,14 @@
         "tsx": "^4.22.4",
         "typescript": "^5.9.3",
         "vscode-extension-tester": "^8.14.1",
-        "zod": "^4.6.7"
+        "zod": "^4.3.6"
     },
     "dependencies": {
         "fast-glob": "^3.3.3"
     },
     "overrides": {
         "serialize-javascript": "^7.0.5",
-        "path-to-regexp": "^8.4.2",
-        "glob@>=9 <14.0.2": "^14.0.2",
-        "minimatch@>=7 <11.0.1": "^11.0.1",
-        "js-yaml@<4": "^3.15.2"
+        "path-to-regexp": "^8.4.2"
     },
     "packageManager": "npm@12.2.2"
 }
