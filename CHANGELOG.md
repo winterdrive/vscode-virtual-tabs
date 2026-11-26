@@ -2,6 +2,10 @@
 
 All notable changes to the "VirtualTabs" extension will be documented in this file.
 
+## [0.18.0] - Stable Release: Dependency Remediation & Input Hardening - 2026-11-26
+
+- **Stable Promotion:** promotes the `0.17.0` pre-release batch to the stable channel, including [#170](https://github.com/winterdrive/vscode-virtual-tabs/pull/170) (re-applied by [#176](https://github.com/winterdrive/vscode-virtual-tabs/pull/176)), #157, #158, #159, #160, #161, #164, #165, #166, #167, #168, #169 and #172 (tests and docs only). The code is the same as the `0.17.0` pre-release. See the `0.17.0` entry below for the individual fixes.
+
 ## [0.17.0] - Dependency Remediation & Input Hardening (pre-release) - 2026-11-26
 
 - **fix(deps):** the bundled MCP server no longer ships known vulnerable dependencies: the `@modelcontextprotocol/sdk` and `zod` ranges are raised to patched versions and both lockfiles are refreshed. `npm audit` reports 0 findings for the root and `mcp-server`, down from 9 production findings in `mcp-server`. Deferred from `0.16.0` so it goes through a pre-release first ([#170](https://github.com/winterdrive/vscode-virtual-tabs/pull/170), deferred by [#174](https://github.com/winterdrive/vscode-virtual-tabs/pull/174), re-applied by [#176](https://github.com/winterdrive/vscode-virtual-tabs/pull/176)).
