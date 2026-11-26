@@ -2,6 +2,11 @@
 
 All notable changes to the "VirtualTabs" extension will be documented in this file.
 
+## [0.19.0] - Custom File Labels (pre-release) - 2026-11-27
+
+- **feat(groups):** files in a custom group can carry a per-group **label** and an optional **description**, so same-named files (several `package.json` or `index.js` in a monorepo) can be told apart without showing paths. Right-click a file and choose **Edit File Label** or **Edit File Description**; blank input clears the field and restores the file name. The tree shows the label in place of the file name with the description beside it, the tooltip keeps the real path, and sorting still uses the real file name. Labels follow the file when it is dragged to another group, auto-grouped by extension or modified date (also over MCP), or when a group is duplicated, and are removed with the file. Not offered in the built-in "Currently Open Files" group. This adds an optional `fileMeta` field to the stored group config (absent when unused, so existing configs load and save unchanged), which is why it goes through a pre-release first. Copy/paste of files between groups does not carry labels yet ([#171](https://github.com/winterdrive/vscode-virtual-tabs/pull/171), first half of [#163](https://github.com/winterdrive/vscode-virtual-tabs/issues/163); "open a group in a new window" is not included).
+- **fix(GroupManager):** saving groups caches a copy instead of the caller's array, so later edits to that array without saving can no longer leak into the next cached load ([#162](https://github.com/winterdrive/vscode-virtual-tabs/pull/162)).
+
 ## [0.18.0] - Stable Release: Dependency Remediation & Input Hardening - 2026-11-26
 
 - **Stable Promotion:** promotes the `0.17.0` pre-release batch to the stable channel, including [#170](https://github.com/winterdrive/vscode-virtual-tabs/pull/170) (re-applied by [#176](https://github.com/winterdrive/vscode-virtual-tabs/pull/176)), #157, #158, #159, #160, #161, #164, #165, #166, #167, #168, #169 and #172 (tests and docs only). The code is the same as the `0.17.0` pre-release. See the `0.17.0` entry below for the individual fixes.
