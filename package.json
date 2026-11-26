@@ -241,6 +241,14 @@
                 "title": "%command.jumpToBookmark.title%"
             },
             {
+                "command": "virtualTabs.editFileLabel",
+                "title": "%command.editFileLabel.title%"
+            },
+            {
+                "command": "virtualTabs.editFileDescription",
+                "title": "%command.editFileDescription.title%"
+            },
+            {
                 "command": "virtualTabs.editBookmarkLabel",
                 "title": "%command.editBookmarkLabel.title%"
             },
@@ -568,6 +576,16 @@
                     "command": "virtualTabs.sendToExcludeGroupFolder",
                     "when": "view == virtualTabsView && (viewItem == virtualTabsGroup || viewItem == virtualTabsGroupBuiltIn)",
                     "group": "9_sendTo@3"
+                },
+                {
+                    "command": "virtualTabs.editFileLabel",
+                    "when": "view == virtualTabsView && (viewItem == virtualTabsFileCustom || viewItem == virtualTabsFileCustomExec)",
+                    "group": "1_edit@1"
+                },
+                {
+                    "command": "virtualTabs.editFileDescription",
+                    "when": "view == virtualTabsView && (viewItem == virtualTabsFileCustom || viewItem == virtualTabsFileCustomExec)",
+                    "group": "1_edit@2"
                 },
                 {
                     "command": "virtualTabs.moveFileUp",

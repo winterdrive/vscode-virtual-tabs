@@ -4,6 +4,8 @@ import { TempFoldersProvider, BUILTIN_SCOPE_ID } from './provider';
 import { TempFileItem, TempFolderItem, BookmarkItem } from './treeItems';
 import { I18n } from './i18n';
 import { BookmarkManager } from './core/BookmarkManager';
+import { FileMetaManager } from './core/FileMetaManager';
+import { matchesStoredFileEntry } from './core/FileEntryMatcher';
 import { TempGroup } from './types';
 import { executeWithConfirmation, getAllFilesInGroupRecursive } from './util';
 import { SkillGenerator } from './mcp/SkillGenerator';
@@ -523,6 +525,7 @@ export function registerCommands(
             id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
             name: newName,
             files: group.files ? [...group.files] : [],
+            ...(group.fileMeta ? { fileMeta: FileMetaManager.clone(group) } : {}),
             sourceScopeId: group.sourceScopeId
         });
         provider.refresh();
@@ -1214,6 +1217,47 @@ export function registerCommands(
             );
         })
     );
+
+    // Edit a file's custom label / description within its (custom) group.
+    // Blank input clears the field; the real path always stays in the tooltip.
+    const registerFileMetaEditor = (
+        commandId: string,
+        field: 'label' | 'description',
+        promptKey: string,
+        placeholderKey: string
+    ) => {
+        context.subscriptions.push(
+            vscode.commands.registerCommand(commandId, async (clicked?: TempFileItem) => {
+                // Right-clicked item from the context menu; fall back to the tree selection (Command Palette).
+                const item = clicked instanceof TempFileItem ? clicked : provider.getSelectedFileItems()[0];
+                if (!(item instanceof TempFileItem)) {
+                    return;
+                }
+                const group = provider.groups[item.groupIdx];
+                if (!group || group.builtIn) {
+                    return;
+                }
+
+                const fileUri = item.uri.toString();
+                const current = FileMetaManager.get(group, fileUri)?.[field] ?? '';
+                const input = await vscode.window.showInputBox({
+                    prompt: I18n.getMessage(promptKey),
+                    value: current,
+                    placeHolder: field === 'label' ? path.basename(item.uri.fsPath) : I18n.getMessage(placeholderKey)
+                });
+                if (input === undefined || input === current) {
+                    return; // Cancelled or unchanged
+                }
+
+                // Key by the entry stored in the group so later lookups match exactly.
+                const storedEntry = group.files?.find(f => matchesStoredFileEntry(f, fileUri, item.uri.fsPath)) ?? fileUri;
+                FileMetaManager.set(group, storedEntry, { [field]: input });
+                provider.refresh();
+            })
+        );
+    };
+    registerFileMetaEditor('virtualTabs.editFileLabel', 'label', 'fileLabel.edit', 'fileLabel.placeholder');
+    registerFileMetaEditor('virtualTabs.editFileDescription', 'description', 'fileDescription.edit', 'fileDescription.placeholder');
 
     // Edit bookmark description
     context.subscriptions.push(

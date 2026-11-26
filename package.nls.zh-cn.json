@@ -37,6 +37,8 @@
     "command.addBookmark.title": "添加书签到分组",
     "command.jumpToBookmark.title": "跳转到书签",
     "command.editBookmarkLabel.title": "编辑书签标签",
+    "command.editFileLabel.title": "编辑文件标签",
+    "command.editFileDescription.title": "编辑文件描述",
     "command.editBookmarkDescription.title": "编辑书签描述",
     "command.removeBookmark.title": "移除书签",
     "submenu.sortFiles.label": "排序文件",

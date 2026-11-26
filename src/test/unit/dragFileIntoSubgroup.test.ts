@@ -27,7 +27,7 @@
  */
 
 import * as path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import type { TempGroup, ConfigScope } from '../../types';
 
 jest.mock('vscode', () => {
@@ -203,5 +203,56 @@ describe('Dragging a file into a sub-group of its own parent (real dragAndDrop.t
         // string for the same file — two entries, one file.
         expect(subGroup.files).toHaveLength(1);
         expect(parentGroup.files).toEqual([]);
+    });
+});
+
+describe('Custom file label follows the file (real dragAndDrop.ts / provider.ts code path)', () => {
+    test('the label moves with the file even when the dragged URI is encoded differently from the stored key', async () => {
+        const storedUri = 'file:///d:/IdeaProjects/etoro_trade/.env.example';
+
+        const parentGroup: TempGroup = {
+            id: 'group-parent',
+            name: 'Parent',
+            files: [storedUri],
+            fileMeta: { [storedUri]: { label: 'etoro env', description: 'sample env' } }
+        };
+        const subGroup: TempGroup = { id: 'group-sub', name: 'Sub', parentGroupId: 'group-parent', files: [] };
+
+        const provider = createProviderHarness([parentGroup, subGroup]);
+        const controller = new TempFoldersDragAndDropController(provider);
+
+        const draggedFileItem = renderFileItem(storedUri, 0, 'group-parent');
+        const targetSubGroupItem = new TempFolderItem('Sub', 1, 'group-sub', false, true);
+        const dataTransfer = new FakeDataTransfer();
+        dataTransfer.set('application/vnd.code.tree.virtualTabsView.files', { value: [draggedFileItem] });
+
+        await controller.handleDrop(targetSubGroupItem, dataTransfer as never, {} as never);
+
+        expect(parentGroup.fileMeta).toBeUndefined();
+        expect(subGroup.fileMeta).toEqual({ [storedUri]: { label: 'etoro env', description: 'sample env' } });
+    });
+
+    test('labels are stored with workspace-relative keys and restored to absolute URIs', () => {
+        const root = path.resolve('/workspace/project');
+        const fileUri = pathToFileURL(path.join(root, 'src', 'a.ts')).toString();
+        const provider = createProviderHarness([]);
+        const internals = provider as unknown as {
+            toStorageGroups(groups: TempGroup[], root: string): TempGroup[];
+            fromStorageGroups(groups: TempGroup[], root: string): TempGroup[];
+        };
+        const group: TempGroup = {
+            id: 'g', name: 'G', files: [fileUri],
+            fileMeta: { [fileUri]: { label: 'A' } }
+        };
+
+        const [stored] = internals.toStorageGroups([group], root);
+        expect(stored.fileMeta).toEqual({ 'src/a.ts': { label: 'A' } });
+
+        const [restored] = internals.fromStorageGroups([stored], root);
+        expect(Object.keys(restored.fileMeta!)).toEqual([restored.files![0]]);
+        expect(restored.fileMeta![restored.files![0]]).toEqual({ label: 'A' });
+
+        const [noMeta] = internals.toStorageGroups([{ id: 'h', name: 'H', files: [fileUri] }], root);
+        expect('fileMeta' in noMeta).toBe(false);
     });
 });

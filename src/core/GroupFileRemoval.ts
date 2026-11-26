@@ -1,5 +1,6 @@
 import { TempGroup } from '../types';
 import { matchesStoredFileEntry } from './FileEntryMatcher';
+import { FileMetaManager } from './FileMetaManager';
 
 export interface FileRemovalTarget {
     uri: string;
@@ -7,7 +8,7 @@ export interface FileRemovalTarget {
 }
 
 export function removeStoredFileEntriesFromGroup(
-    group: Pick<TempGroup, 'files' | 'bookmarks'>,
+    group: Pick<TempGroup, 'files' | 'bookmarks' | 'fileMeta'>,
     targets: FileRemovalTarget[],
     scopeRoot?: string
 ): boolean {
@@ -32,6 +33,10 @@ export function removeStoredFileEntriesFromGroup(
         if (Object.keys(group.bookmarks).length === 0) {
             delete group.bookmarks;
         }
+    }
+
+    for (const target of targets) {
+        FileMetaManager.remove(group, target.uri, target.fsPath, scopeRoot);
     }
 
     return group.files.length !== originalLength;

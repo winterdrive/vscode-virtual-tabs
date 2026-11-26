@@ -4,6 +4,7 @@ import { GroupManager } from './GroupManager.js';
 import { FileManager } from './FileManager.js';
 import { PathUtils } from './PathUtils.js';
 import { BookmarkManager } from './BookmarkManager.js';
+import { FileMetaManager } from './FileMetaManager.js';
 import { SortCriteria, DateGroup, TempGroup } from '../types.js';
 
 export class AutoGrouper {
@@ -186,6 +187,8 @@ export class AutoGrouper {
 
       AutoGrouper.moveBookmarks(sourceGroup, newGroup, uriList);
 
+      FileMetaManager.move(sourceGroup, newGroup, uriList);
+
       groups.push(newGroup);
       createdGroups.push({
         id: newGroup.id,
@@ -245,6 +248,8 @@ export class AutoGrouper {
       };
 
       AutoGrouper.moveBookmarks(sourceGroup, newGroup, uriList);
+
+      FileMetaManager.move(sourceGroup, newGroup, uriList);
 
       groups.push(newGroup);
       createdGroups.push({
