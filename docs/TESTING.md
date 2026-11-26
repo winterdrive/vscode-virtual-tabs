@@ -3,7 +3,7 @@
 [繁體中文](./TESTING.zh-TW.md) | English
 
 This is the current, maintained reference for this repo's **automated** test
-suites (v0.17.0 pre-release train). The current root baseline is **53 suites /
+suites (v0.18.0 stable release). The current root baseline is **53 suites /
 307 tests** (49 unit suites and 4 property suites). If you find older local notes describing manual test
 checklists for specific past issues, they don't describe the actual current
 suite — don't use them to judge current behavior or coverage.
